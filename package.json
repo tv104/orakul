@@ -6,22 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "compile": "cd blockchain && npx hardhat compile",
+    "node": "cd blockchain && npx hardhat node",
+    "deploy-local": "cd blockchain && npx hardhat run ./scripts/deploy.js --network localhost",
+    "test-blockchain": "cd blockchain && npx hardhat test"
   },
   "dependencies": {
+    "next": "15.3.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@chainlink/contracts": "^1.3.0",
+    "@eslint/eslintrc": "^3",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
-    "@eslint/eslintrc": "^3"
+    "hardhat": "^2.23.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
