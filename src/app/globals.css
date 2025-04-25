@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --font-size: 18px;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -19,8 +20,12 @@
   }
 }
 
+html {
+  font-size: var(--font-size);
+}
 body {
-  background: var(--background);
+  background: url("/background.png") no-repeat center center fixed;
+  background-size: cover;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
