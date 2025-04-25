@@ -16,6 +16,12 @@ const eslintConfig = [
     rules: {
       "@typescript-eslint/no-unused-expressions": "off",
     }
+  },
+  {
+    files: ["**/blockchain/scripts/**/*.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off"
+    }
   }
 ];
 

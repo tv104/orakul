@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const hre = require("hardhat");
 
 async function main() {
@@ -14,7 +13,7 @@ async function main() {
   // Create a subscription on the mock coordinator
   const tx = await mockCoordinator.createSubscription();
   await tx.wait();
-  const subscriptionId = 1n; // In the mock, this will be 1 (using bigint)
+  const subscriptionId = 1n;
 
   // Fund the subscription
   await mockCoordinator.fundSubscription(subscriptionId, hre.ethers.parseEther("10"));
