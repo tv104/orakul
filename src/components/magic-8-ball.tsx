@@ -14,7 +14,7 @@ export const Magic8Ball = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedQuestion, setSubmittedQuestion] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     askQuestion,
@@ -29,8 +29,8 @@ export const Magic8Ball = () => {
     setMounted(true);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
 
     if (loading || isSubmitting) return;
 
@@ -59,6 +59,10 @@ export const Magic8Ball = () => {
     }
   };
 
+  const handleEnter = () => {
+    handleSubmit();
+  };
+
   const disableInput = useMemo(() => {
     return loading || isSubmitting;
   }, [loading, isSubmitting]);
@@ -81,6 +85,7 @@ export const Magic8Ball = () => {
             onChange={(e) => setQuestion(e.target.value)}
             autoComplete="off"
             required
+            onEnter={handleEnter}
           />
 
           <Button

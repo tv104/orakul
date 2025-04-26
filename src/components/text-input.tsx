@@ -1,9 +1,17 @@
 import { cn } from "@/utils";
-import { useState, forwardRef } from "react";
+import {
+  useState,
+  forwardRef,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
-interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   value: string;
+  allowLineBreaks?: boolean;
+  onEnter?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
 
 // Group styles by component part
@@ -24,10 +32,10 @@ const styles = {
     },
   },
   input:
-    "w-full p-2 py-4 rounded border-none outline-none text-2xl text-shadow-md",
+    "w-full max-h-[50vh] p-2 py-4 rounded border-none outline-none text-2xl text-shadow-md overflow-auto resize-none",
   label: {
-    base: "absolute pointer-events-none top-0 bottom-0 left-2 text-indigo-100 text-shadow-md mix-blend-luminosity font-medium uppercase transition-transform duration-400 ease-out group-focus-within:translate-y-[-56px] inline-flex items-center",
-    dirty: "translate-y-[-56px] pointer-events-auto",
+    base: "absolute pointer-events-none top-5 left-2 text-indigo-100 text-shadow-md mix-blend-luminosity font-medium uppercase transition-position duration-400 ease-out group-focus-within:-top-7",
+    dirty: "-top-7 pointer-events-auto",
   },
   maxLength: {
     base: "text-xs absolute bottom-[-20px] right-0 group-focus-within:translate-y-[3px] text-indigo-100 opacity-0 group-focus-within:opacity-100 transition-all duration-400 ease-out",
@@ -35,14 +43,74 @@ const styles = {
   },
 };
 
-export const TextInput = forwardRef<HTMLInputElement, Props>(
-  ({ label, value, maxLength, onChange, className, ...props }, ref) => {
+export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
+  (
+    {
+      label,
+      value,
+      maxLength,
+      onChange,
+      className,
+      rows = 1,
+      allowLineBreaks = false,
+      onEnter,
+      ...props
+    },
+    ref
+  ) => {
     const [isDirty, setIsDirty] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setIsDirty(!!e.target.value.length);
-      onChange?.(e);
+    // Combine the forwarded ref with our local ref
+    const setRefs = (element: HTMLTextAreaElement | null) => {
+      textareaRef.current = element;
+      if (typeof ref === "function") {
+        ref(element);
+      } else if (ref) {
+        ref.current = element;
+      }
     };
+
+    const adjustHeight = useCallback(() => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      // "auto" required for height to shrink
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }, []);
+
+    const handleChange = useCallback(
+      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        let newValue = e.target.value;
+
+        if (!allowLineBreaks) {
+          newValue = newValue.replace(/\r?\n/g, " ");
+        }
+
+        setIsDirty(!!newValue.length);
+
+        onChange?.({
+          ...e,
+          target: { ...e.target, value: newValue },
+        } as React.ChangeEvent<HTMLTextAreaElement>);
+      },
+      [allowLineBreaks, onChange]
+    );
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter") {
+          if (!allowLineBreaks) e.preventDefault();
+          onEnter?.(e);
+        }
+      },
+      [allowLineBreaks, onEnter]
+    );
+
+    useLayoutEffect(() => {
+      adjustHeight();
+    }, [adjustHeight, value]);
 
     return (
       <div
@@ -55,14 +123,15 @@ export const TextInput = forwardRef<HTMLInputElement, Props>(
           className
         )}
       >
-        <input
-          ref={ref}
-          type="text"
+        <textarea
+          ref={setRefs}
           id="question"
           value={value}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           className={styles.input}
           maxLength={maxLength}
+          rows={rows}
           {...props}
         />
         <label
