@@ -1,6 +1,6 @@
 import { useMousePosition } from "@/hooks";
 import Image, { type StaticImageData } from "next/image";
-import React, { type FC, useMemo } from "react";
+import React, { type FC, useMemo, useRef, useEffect, useState } from "react";
 
 interface ParallaxBackgroundProps {
   backgroundImage: StaticImageData;
@@ -8,7 +8,8 @@ interface ParallaxBackgroundProps {
 }
 
 const BG_FACTOR = 20;
-const FG_FACTOR = 40;
+const FG_FACTOR = 42;
+const TRANSITION_SPEED = 0.1;
 
 const containerStyles = `fixed 
     left-[-${BG_FACTOR}px] 
@@ -21,14 +22,35 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
   backgroundImage,
   foregroundImage,
 }) => {
+  // TODO fallback for touch devices
   const { x, y } = useMousePosition();
+  const [smoothX, setSmoothX] = useState(0);
+  const [smoothY, setSmoothY] = useState(0);
+  const animationRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const animate = () => {
+      setSmoothX((prev) => prev + (x - prev) * TRANSITION_SPEED);
+      setSmoothY((prev) => prev + (y - prev) * TRANSITION_SPEED);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [x, y]);
 
   const backgroundTransform = useMemo(() => {
-    return `translate(${x * -BG_FACTOR}px, ${y * -BG_FACTOR}px)`;
-  }, [x, y]);
+    return `translate(${smoothX * -BG_FACTOR}px, ${smoothY * -BG_FACTOR}px)`;
+  }, [smoothX, smoothY]);
+
   const foregroundTransform = useMemo(() => {
-    return `translate(${x * -FG_FACTOR}px, ${y * -FG_FACTOR}px)`;
-  }, [x, y]);
+    return `translate(${smoothX * -FG_FACTOR}px, ${smoothY * -FG_FACTOR}px)`;
+  }, [smoothX, smoothY]);
 
   return (
     <div className={containerStyles}>
