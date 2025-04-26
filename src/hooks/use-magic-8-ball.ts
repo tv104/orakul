@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAccount, usePublicClient, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, usePublicClient, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
 import magic8Ball from "../artifacts/contracts/Magic8Ball.sol/Magic8Ball.json";
-import { toEventSelector } from "viem";
 import { assertNotNull, isPredictionTuple, MAGIC_8_BALL_ANSWERS } from "@/utils";
 import type { PredictionResult } from "@/types";
 
@@ -15,6 +14,9 @@ export function useMagic8Ball() {
   const [requestId, setRequestId] = useState<bigint | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
+  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | null>(null);
+
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   
@@ -24,44 +26,67 @@ export function useMagic8Ball() {
     functionName: "getMaxQuestionLength",
   });
   
-  const { data: prediction, refetch: refetchPrediction } = useReadContract({
+  const { refetch: refetchPrediction } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: "getPredictionResult",
     args: requestId ? [requestId] : undefined,
   });
-  
-  const fetchPrediction = useCallback(async (): Promise<void> => {
-    const timeout = 30_000;
-    const startTime = Date.now();
-    
-    const checkPrediction = async (): Promise<void> => {
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    eventName: 'PredictionRequested',
+    enabled: !!pendingTxHash,
+    onLogs(logs) {
+      const relevantLogs = logs.filter(log => 
+        log.transactionHash === pendingTxHash
+      );
+      
+      if (relevantLogs.length > 0) {
+        const log = relevantLogs[0];
+        
+        // topics[0] is the event signature, topics[1] is the first indexed param
+        if (log.topics && log.topics.length > 1 && log.topics[1]) {
+          const newRequestId = BigInt(log.topics[1]);
+          setRequestId(newRequestId);
+          setPendingTxHash(null);
+        }
+      }
+    },
+  });
+
+  useWatchContractEvent({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    eventName: 'PredictionResult',
+    enabled: requestId !== null,
+    async onLogs() {
       try {
-        const { data: result } = await refetchPrediction();
-        
+        const { data: result } = await refetchPrediction({ 
+          throwOnError: true 
+        });
+
         if (isPredictionTuple(result) && result[0] === true) {
-          return;
+          setPrediction({
+            fulfilled: result[0],
+            outcomeIndex: Number(result[1]),
+            player: result[2],
+            question: result[3],
+            answer: result[0] ? MAGIC_8_BALL_ANSWERS[Number(result[1])] : "",
+          });
+          setLoading(false);
         }
-        
-        if (Date.now() - startTime >= timeout) {
-          throw new Error(`Timeout (${timeout}ms) while waiting for prediction`);
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 1_000));
-        return checkPrediction();
       } catch (err) {
         console.error("Error fetching prediction:", err);
-        setError(err instanceof Error ? err.message : "An error occurred");
       }
-    };
-    
-    return checkPrediction();
-  }, [refetchPrediction]);
-  
+    },
+  });
+
   const askQuestion = useCallback(async (question: string) => {
     if (!isConnected) {
       setError("Wallet not connected");
-      return;
+      return null;
     }
     
     try {
@@ -76,52 +101,27 @@ export function useMagic8Ball() {
         args: [question],
       });
       
-      const { logs } = await publicClient.getTransactionReceipt({
-        hash: txResult,
-      });
-      
-      const event = logs.find(
-        (log) => 
-          log.topics[0] === 
-        toEventSelector("PredictionRequested(uint256,address,string)")
-      );
-      
-      if (event && event.topics[1]) {
-        const requestId = BigInt(event.topics[1]);
-        setRequestId(requestId);
-        fetchPrediction();
-        
-        return requestId;
-      }
+      setPendingTxHash(txResult);
+      return txResult;
     } catch (err) {
       console.error("Error asking question:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
+      return null;
     } finally {
       setLoading(false);
     }
-  }, [fetchPrediction, isConnected, publicClient, writeContractAsync]);
-  
-  const processedPrediction: PredictionResult | undefined = isPredictionTuple(prediction)
-    ? {
-      fulfilled: prediction[0],
-      outcomeIndex: Number(prediction[1]),
-      player: prediction[2],
-      question: prediction[3],
-      answer: prediction[0] ? MAGIC_8_BALL_ANSWERS[Number(prediction[1])] : "",
-    }
-    : undefined;
+  }, [isConnected, publicClient, writeContractAsync]);
 
   const processedMaxQuestionLength = typeof maxQuestionLength === 'bigint' ? Number(maxQuestionLength) : 200;
   
   return {
     askQuestion,
-    prediction: processedPrediction,
+    prediction,
     requestId,
     maxQuestionLength: processedMaxQuestionLength,
     loading,
     error,
     isConnected,
     address,
-    fetchPrediction
   };
 }
