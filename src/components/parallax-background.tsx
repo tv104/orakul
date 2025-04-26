@@ -12,10 +12,10 @@ const FG_FACTOR = 42;
 const TRANSITION_SPEED = 0.1;
 
 const containerStyles = `fixed 
-    left-[-${BG_FACTOR}px] 
-    top-[-${BG_FACTOR}px] 
-    right-[-${BG_FACTOR}px] 
-    bottom-[-${BG_FACTOR}px]
+  left-[${-BG_FACTOR}px] 
+  top-[${-BG_FACTOR}px] 
+  right-[${-BG_FACTOR}px] 
+  bottom-[${-BG_FACTOR}px]
 `;
 
 export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
