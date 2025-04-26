@@ -10,3 +10,11 @@ export function assertNotUndefined<T>(value: T | undefined, message: string): as
         throw new Error(message);
     }
 }
+
+export function assertValidAddress(address: string): asserts address is `0x${string}` {
+    if (!address.startsWith("0x")) {
+        throw new Error("Address is not a valid Ethereum address");
+    }
+}
+
+

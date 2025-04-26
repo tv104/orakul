@@ -5,8 +5,9 @@ import { useAccount, usePublicClient, useReadContract, useWriteContract, useWatc
 import magic8Ball from "../artifacts/contracts/Magic8Ball.sol/Magic8Ball.json";
 import { assertNotNull, isPredictionTuple, MAGIC_8_BALL_ANSWERS } from "@/utils";
 import type { PredictionResult } from "@/types";
+import { envConfig } from "@/utils";
 
-const CONTRACT_ADDRESS = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
 const CONTRACT_ABI = magic8Ball.abi;
 
 export function useMagic8Ball() {
@@ -16,25 +17,25 @@ export function useMagic8Ball() {
   const [error, setError] = useState<string | null>(null);
   const [prediction, setPrediction] = useState<PredictionResult | null>(null);
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | null>(null);
-
+  
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   
   const { data: maxQuestionLength } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI, 
     functionName: "getMaxQuestionLength",
   });
   
   const { refetch: refetchPrediction } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: "getPredictionResult",
     args: requestId ? [requestId] : undefined,
   });
 
   useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
+    address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'PredictionRequested',
     enabled: !!pendingTxHash,
@@ -57,7 +58,7 @@ export function useMagic8Ball() {
   });
 
   useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
+    address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'PredictionResult',
     enabled: requestId !== null,
@@ -95,7 +96,7 @@ export function useMagic8Ball() {
       assertNotNull(publicClient);
       
       const txResult = await writeContractAsync({
-        address: CONTRACT_ADDRESS,
+        address: NEXT_PUBLIC_CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: "askQuestion",
         args: [question],
