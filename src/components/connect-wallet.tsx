@@ -20,7 +20,7 @@ export const ConnectWallet = () => {
   if (isConnected) {
     return (
       <div className="flex items-center gap-5">
-        <Button onClick={() => disconnect()}>
+        <Button onClick={() => disconnect()} variant="outlined">
           Disconnect {`${address?.slice(0, 4)}...${address?.slice(-2)}`}
         </Button>
       </div>
