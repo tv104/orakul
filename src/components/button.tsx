@@ -22,12 +22,13 @@ const buttonVariants = cva(
       {
         variant: "contained",
         state: "default",
-        className: "hover:bg-neutral-200 active:bg-neutral-300",
+        className: "hover:bg-white active:bg-neutral-200 hover:text-gray-600",
       },
       {
         variant: "outlined",
         state: "default",
-        className: "hover:bg-neutral-200/10 active:bg-transparent",
+        className:
+          "bg-transparent hover:bg-neutral-200/10 active:bg-transparent hover:text-white",
       },
     ],
     defaultVariants: {
