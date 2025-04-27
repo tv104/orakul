@@ -5,43 +5,18 @@ import {
   useRef,
   useCallback,
   useLayoutEffect,
+  useMemo,
 } from "react";
+import { textInputStyles } from "./text-input-styles";
 
 interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   value: string;
+  labelClassName?: string;
+  maxLengthClassName?: string;
   allowLineBreaks?: boolean;
   onEnter?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
-
-// Group styles by component part
-const styles = {
-  container: {
-    base: "mb-4 relative group",
-    pseudo: {
-      before:
-        "before:absolute before:h-[2px] before:w-full before:bg-indigo-100 hover:before:bg-indigo-200 before:bottom-0 before:left-0 before:right-0 before:transition-transform before:ease-out before:duration-400",
-      after:
-        "after:absolute after:h-[2px] after:w-full after:bg-indigo-100 hover:after:bg-indigo-200 after:top-0 after:left-0 after:right-0 after:transition-transform after:ease-out after:duration-400",
-    },
-    states: {
-      focus:
-        "focus-within:before:translate-y-[3px] focus-within:after:translate-y-[-3px] focus-within:before:bg-indigo-200 focus-within:after:bg-indigo-200",
-      dirty:
-        "before:translate-y-[3px] after:translate-y-[-3px] before:bg-indigo-200 after:bg-indigo-200",
-    },
-  },
-  input:
-    "w-full max-h-[50vh] p-2 py-4 rounded border-none outline-none text-2xl text-shadow-md overflow-auto resize-none",
-  label: {
-    base: "absolute pointer-events-none top-5 left-2 text-indigo-100 text-shadow-md mix-blend-luminosity font-medium uppercase transition-position duration-400 ease-out group-focus-within:-top-7",
-    dirty: "-top-7 pointer-events-auto",
-  },
-  maxLength: {
-    base: "text-xs absolute bottom-[-20px] right-0 group-focus-within:translate-y-[3px] text-indigo-100 opacity-0 group-focus-within:opacity-100 transition-all duration-400 ease-out",
-    dirty: "translate-y-[3px] opacity-100",
-  },
-};
 
 export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
   (
@@ -51,6 +26,8 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
       maxLength,
       onChange,
       className,
+      labelClassName,
+      maxLengthClassName,
       rows = 1,
       allowLineBreaks = false,
       onEnter,
@@ -70,15 +47,6 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
         ref.current = element;
       }
     };
-
-    const adjustHeight = useCallback(() => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-
-      // "auto" required for height to shrink
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }, []);
 
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -109,43 +77,54 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
     );
 
     useLayoutEffect(() => {
-      adjustHeight();
-    }, [adjustHeight, value]);
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      // "auto" required for height to shrink
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }, [value]);
+
+    const styles = useMemo(() => {
+      return {
+        container: cn(
+          textInputStyles.container.base,
+          textInputStyles.container.pseudo.before,
+          textInputStyles.container.pseudo.after,
+          textInputStyles.container.states.focus,
+          isDirty && textInputStyles.container.states.dirty,
+          className
+        ),
+        label: cn(
+          textInputStyles.label.base,
+          isDirty && textInputStyles.label.dirty,
+          labelClassName
+        ),
+        maxLength: cn(
+          textInputStyles.maxLength.base,
+          isDirty && textInputStyles.maxLength.dirty,
+          maxLengthClassName
+        ),
+      };
+    }, [className, isDirty, labelClassName, maxLengthClassName]);
 
     return (
-      <div
-        className={cn(
-          styles.container.base,
-          styles.container.pseudo.before,
-          styles.container.pseudo.after,
-          styles.container.states.focus,
-          isDirty && styles.container.states.dirty,
-          className
-        )}
-      >
+      <div className={styles.container}>
         <textarea
           ref={setRefs}
           id="question"
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className={styles.input}
+          className={textInputStyles.input}
           maxLength={maxLength}
           rows={rows}
           {...props}
         />
-        <label
-          htmlFor="question"
-          className={cn(styles.label.base, isDirty && styles.label.dirty)}
-        >
+        <label htmlFor="question" className={styles.label}>
           {label}
         </label>
-        <div
-          className={cn(
-            styles.maxLength.base,
-            isDirty && styles.maxLength.dirty
-          )}
-        >
+        <div className={styles.maxLength}>
           {value.length}/{maxLength}
         </div>
       </div>

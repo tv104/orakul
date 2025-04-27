@@ -1,37 +1,29 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAccount, usePublicClient, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
 import magic8Ball from "../artifacts/contracts/Magic8Ball.sol/Magic8Ball.json";
-import { assertNotNull, isPredictionTuple, MAGIC_8_BALL_ANSWERS } from "@/utils";
-import type { PredictionResult } from "@/types";
+import { assertValidAddress, isOutcomeIndexInLog } from "@/utils";
 import { envConfig } from "@/utils";
+import { checklistSteps } from "@/components";
 
 const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
 const CONTRACT_ABI = magic8Ball.abi;
 
 export function useMagic8Ball() {
-  const { isConnected, address } = useAccount();
-  const [requestId, setRequestId] = useState<bigint | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [prediction, setPrediction] = useState<PredictionResult | null>(null);
-  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | null>(null);
-  
+  const { isConnected } = useAccount();
   const { writeContractAsync } = useWriteContract();
-  const publicClient = usePublicClient();
+
+  const [requestId, setRequestId] = useState<`0x${string}` | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [outcomeIndex, setOutcomeIndex] = useState<number | undefined>(undefined);
+  const [activeStep, setActiveStep] = useState<keyof typeof checklistSteps>("init"); // UI state
   
   const { data: maxQuestionLength } = useReadContract({
     address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI, 
     functionName: "getMaxQuestionLength",
-  });
-  
-  const { refetch: refetchPrediction } = useReadContract({
-    address: NEXT_PUBLIC_CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: "getPredictionResult",
-    args: requestId ? [requestId] : undefined,
   });
 
   useWatchContractEvent({
@@ -47,11 +39,13 @@ export function useMagic8Ball() {
       if (relevantLogs.length > 0) {
         const log = relevantLogs[0];
         
-        // topics[0] is the event signature, topics[1] is the first indexed param
+        // topics[0] = event signature, topics[1] = first indexed param
         if (log.topics && log.topics.length > 1 && log.topics[1]) {
-          const newRequestId = BigInt(log.topics[1]);
+          const newRequestId = log.topics[1] as `0x${string}`;
+          assertValidAddress(newRequestId);
+          setActiveStep("waiting_for_event_prediction_result");
           setRequestId(newRequestId);
-          setPendingTxHash(null);
+          setPendingTxHash(undefined);
         }
       }
     },
@@ -61,25 +55,25 @@ export function useMagic8Ball() {
     address: NEXT_PUBLIC_CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'PredictionResult',
-    enabled: requestId !== null,
-    async onLogs() {
-      try {
-        const { data: result } = await refetchPrediction({ 
-          throwOnError: true 
-        });
+    enabled: requestId !== undefined,
+    async onLogs(logs) {
+      console.log("logs", logs);
+      const relevantLogs = logs.filter(log => 
+        log.topics[1] === requestId
+      );
 
-        if (isPredictionTuple(result) && result[0] === true) {
-          setPrediction({
-            fulfilled: result[0],
-            outcomeIndex: Number(result[1]),
-            player: result[2],
-            question: result[3],
-            answer: result[0] ? MAGIC_8_BALL_ANSWERS[Number(result[1])] : "",
-          });
-          setLoading(false);
+      if (relevantLogs.length > 0) {
+        const log = relevantLogs[0];
+
+        if (isOutcomeIndexInLog(log)) {
+          setOutcomeIndex(log.args.outcomeIndex);	
+          setRequestId(undefined);
+          setActiveStep("completed");
+        } else {
+          throw new Error("Invalid log format: missing args or args is not an object");
         }
-      } catch (err) {
-        console.error("Error fetching prediction:", err);
+      } else {
+        console.error("No relevant logs found");
       }
     },
   });
@@ -91,10 +85,7 @@ export function useMagic8Ball() {
     }
     
     try {
-      setLoading(true);
       setError(null);
-      assertNotNull(publicClient);
-      
       const txResult = await writeContractAsync({
         address: NEXT_PUBLIC_CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
@@ -102,27 +93,25 @@ export function useMagic8Ball() {
         args: [question],
       });
       
+      setActiveStep("waiting_for_tx_mined");
       setPendingTxHash(txResult);
       return txResult;
     } catch (err) {
       console.error("Error asking question:", err);
       setError(err instanceof Error ? err.message : "An error occurred");
       return null;
-    } finally {
-      setLoading(false);
     }
-  }, [isConnected, publicClient, writeContractAsync]);
+  }, [isConnected, writeContractAsync]);
 
-  const processedMaxQuestionLength = typeof maxQuestionLength === 'bigint' ? Number(maxQuestionLength) : 200;
+  const processedMaxQuestionLength = typeof maxQuestionLength === 'bigint' || typeof maxQuestionLength === 'number' ? Number(maxQuestionLength) : 200;
   
   return {
+    activeStep,
     askQuestion,
-    prediction,
-    requestId,
-    maxQuestionLength: processedMaxQuestionLength,
-    loading,
     error,
     isConnected,
-    address,
+    maxQuestionLength: processedMaxQuestionLength,
+    requestId,
+    outcomeIndex
   };
 }

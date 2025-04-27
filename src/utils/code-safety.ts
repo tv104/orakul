@@ -17,4 +17,19 @@ export function assertValidAddress(address: string): asserts address is `0x${str
     }
 }
 
-
+export function isOutcomeIndexInLog(log: unknown): log is { args: { outcomeIndex: number } } {
+    if (typeof log !== 'object' || log === null) {
+      return false;
+    }
+    
+    const typedLog = log as Record<string, unknown>;
+    
+    // Check if args exists and is an object
+    if (!typedLog.args || typeof typedLog.args !== 'object' || typedLog.args === null) {
+      return false;
+    }
+    
+    // Check if args.outcomeIndex exists and is a number
+    const args = typedLog.args as Record<string, unknown>;
+    return 'outcomeIndex' in args && typeof args.outcomeIndex === 'number';
+  }
