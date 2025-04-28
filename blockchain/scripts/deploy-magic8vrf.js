@@ -18,23 +18,23 @@ async function main() {
   // Fund the subscription
   await mockCoordinator.fundSubscription(subscriptionId, hre.ethers.parseEther("10"));
 
-  // Deploy the Magic8Ball contract
+  // Deploy the Magic8VRF contract
   const keyHash = "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c";
   const callbackGasLimit = 100000;
   
-  const Magic8Ball = await hre.ethers.getContractFactory("Magic8Ball");
-  const magic8Ball = await Magic8Ball.deploy(
+  const Magic8VRF = await hre.ethers.getContractFactory("Magic8VRF");
+  const magic8VRF = await Magic8VRF.deploy(
     await mockCoordinator.getAddress(),
     subscriptionId,
     keyHash,
     callbackGasLimit
   );
 
-  await magic8Ball.waitForDeployment();
-  console.log("Magic8Ball deployed to:", await magic8Ball.getAddress());
+  await magic8VRF.waitForDeployment();
+  console.log("Magic8VRF deployed to:", await magic8VRF.getAddress());
 
   // Add the consumer to the subscription
-  await mockCoordinator.addConsumer(subscriptionId, await magic8Ball.getAddress());
+  await mockCoordinator.addConsumer(subscriptionId, await magic8VRF.getAddress());
 }
 
 main().catch((error) => {

@@ -2,13 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
-import magic8Ball from "../artifacts/contracts/Magic8Ball.sol/Magic8Ball.json";
+import magic8VRF from "../artifacts/contracts/Magic8VRF.sol/Magic8VRF.json";
 import { isNewRequestIdInFirstLog, isOutcomeIndexInFirstLog } from "@/utils";
 import { envConfig } from "@/utils";
 import { checklistSteps } from "@/components";
 
 const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
-const CONTRACT_ABI = magic8Ball.abi;
+const CONTRACT_ABI = magic8VRF.abi;
 
 export function useMagic8Ball() {
   const { isConnected } = useAccount();
