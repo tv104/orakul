@@ -1,2 +1,2 @@
-export * from "./use-magic-8-vrf";
+export * from "./use-orakul";
 export * from "./use-mouse-position";

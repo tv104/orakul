@@ -3,22 +3,22 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
-import { assertNotUndefined, cn, MAGIC_8_VRF_TRANSLATIONS } from "@/utils";
+import { assertNotUndefined, cn, ORAKUL_TRANSLATIONS } from "@/utils";
 import { TextInput } from "../text-input";
-import { useMagic8VRFContext } from "@/providers";
-import { Magic8Buttons } from "./magic-8-buttons";
+import { useOrakulContext } from "@/providers";
+import { OrakulButtons } from "./orakul-buttons";
 
-interface Magic8FormProps {
+interface OrakulFormProps {
   submittedQuestion: boolean;
   setSubmittedQuestion: (value: boolean) => void;
 }
 
-export const Magic8Form = ({
+export const OrakulForm = ({
   submittedQuestion,
   setSubmittedQuestion,
-}: Magic8FormProps) => {
+}: OrakulFormProps) => {
   const { isConnected, maxQuestionLength, outcomeIndex, askQuestion, reset } =
-    useMagic8VRFContext();
+    useOrakulContext();
 
   const { connect } = useConnect();
   const [question, setQuestion] = useState("");
@@ -28,7 +28,7 @@ export const Magic8Form = ({
 
   const hasOutcomeIndex = outcomeIndex !== undefined;
   const fullAnswer = hasOutcomeIndex
-    ? `\n\n🔮 ${MAGIC_8_VRF_TRANSLATIONS[outcomeIndex]}`
+    ? `\n\n🔮 ${ORAKUL_TRANSLATIONS[outcomeIndex]}`
     : "";
 
   useLayoutEffect(() => {
@@ -122,7 +122,7 @@ export const Magic8Form = ({
         maxLengthClassName={submittedQuestion ? "fade-out" : ""}
       />
 
-      <Magic8Buttons
+      <OrakulButtons
         submittedQuestion={submittedQuestion}
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit}

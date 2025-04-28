@@ -2,17 +2,17 @@
 
 import { useState } from "react";
 
-import { useMagic8VRFContext } from "@/providers";
+import { useOrakulContext } from "@/providers";
 import { StatusList } from "../status-list";
-import { Magic8Form } from "./magic-8-form";
+import { OrakulForm } from "./orakul-form";
 
-export const Magic8VRF = () => {
+export const Orakul = () => {
   const [submittedQuestion, setSubmittedQuestion] = useState(false);
-  const { activeStep, error } = useMagic8VRFContext();
+  const { activeStep, error } = useOrakulContext();
 
   return (
     <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-7 relative">
-      <Magic8Form
+      <OrakulForm
         submittedQuestion={submittedQuestion}
         setSubmittedQuestion={setSubmittedQuestion}
       />

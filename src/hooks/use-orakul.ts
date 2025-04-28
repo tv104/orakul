@@ -2,15 +2,15 @@
 
 import { useCallback, useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
-import magic8VRF from "../artifacts/contracts/Magic8VRF.sol/Magic8VRF.json";
+import orakul from "../artifacts/contracts/Orakul.sol/Orakul.json";
 import { isNewRequestIdInFirstLog, isOutcomeIndexInFirstLog } from "@/utils";
 import { envConfig } from "@/utils";
 import { type StepKey } from "@/components";
 
 const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
-const CONTRACT_ABI = magic8VRF.abi;
+const CONTRACT_ABI = orakul.abi;
 
-export function useMagic8VRF() {
+export function useOrakul() {
   const { isConnected } = useAccount();
   const { writeContractAsync } = useWriteContract();
 

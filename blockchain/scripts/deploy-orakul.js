@@ -18,23 +18,23 @@ async function main() {
   // Fund the subscription
   await mockCoordinator.fundSubscription(subscriptionId, hre.ethers.parseEther("10"));
 
-  // Deploy the Magic8VRF contract
+  // Deploy the Orakul contract
   const keyHash = "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c";
   const callbackGasLimit = 100000;
   
-  const Magic8VRF = await hre.ethers.getContractFactory("Magic8VRF");
-  const magic8VRF = await Magic8VRF.deploy(
+  const Orakul = await hre.ethers.getContractFactory("Orakul");
+  const orakul = await Orakul.deploy(
     await mockCoordinator.getAddress(),
     subscriptionId,
     keyHash,
     callbackGasLimit
   );
 
-  await magic8VRF.waitForDeployment();
-  console.log("Magic8VRF deployed to:", await magic8VRF.getAddress());
+  await orakul.waitForDeployment();
+  console.log("Orakul deployed to:", await orakul.getAddress());
 
   // Add the consumer to the subscription
-  await mockCoordinator.addConsumer(subscriptionId, await magic8VRF.getAddress());
+  await mockCoordinator.addConsumer(subscriptionId, await orakul.getAddress());
 }
 
 main().catch((error) => {

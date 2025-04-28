@@ -1,8 +1,8 @@
-# Magic 8 VRF
+# Oraku
 
-**Magic 8 VRF** is an on-chain, verifiable version of the classic Magic 8 Ball, powered by [Chainlink VRF](https://docs.chain.link/vrf).
+**Oraku** is an on-chain, verifiably random answer generator, powered by [Chainlink VRF](https://docs.chain.link/vrf).
 
-Ask your question, get an answer with guaranteed randomness.
+This was built as an educational web3 project, inspired by the [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball).
 
 ## Features
 
@@ -16,7 +16,7 @@ Ask your question, get an answer with guaranteed randomness.
 ```bash
 npm install
 npm run node # local hardhat environment
-npm run deploy-magic8vrf-local # deploy smart contracts locally
+npm run deploy-orakul-local # deploy smart contracts locally
 npm run auto-fulfill-vrf # mock VRF responses
 npm run dev # run the front-end
 ```

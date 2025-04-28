@@ -1,12 +1,12 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const Magic8VRF = await ethers.getContractAt("Magic8VRF", "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9");
+  const Orakul = await ethers.getContractAt("Orakul", "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9");
   const mockCoord = await ethers.getContractAt("MockVRFCoordinatorV2", "0x5FbDB2315678afecb367f032d93F642f64180aa3");
   
   console.log("Starting VRF auto-fulfillment script...");
   
-  Magic8VRF.on("PredictionRequested", async (requestId, player, question) => {
+  Orakul.on("PredictionRequested", async (requestId, player, question) => {
     console.log(`Detected prediction request ID: ${requestId.toString()}`);
     console.log(`Player: ${player}`);
     console.log(`Question: ${question}`);
@@ -15,7 +15,7 @@ async function main() {
     await new Promise(resolve => setTimeout(resolve, 2_500));
     
     try {
-      const contractAddress = await Magic8VRF.getAddress();
+      const contractAddress = await Orakul.getAddress();
       const tx = await mockCoord.fulfillRandomWords(requestId, contractAddress);
       await tx.wait();
       console.log(`Fulfilled request ID: ${requestId.toString()}`);

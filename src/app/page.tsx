@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectWallet, Magic8VRF, ParallaxBackground } from "@/components";
+import { ConnectWallet, Orakul, ParallaxBackground } from "@/components";
 import room from "@/images/room.png";
 import hands from "@/images/hands.png";
 
@@ -13,7 +13,7 @@ export default function Home() {
           <div className="flex justify-end mb-6">
             <ConnectWallet />
           </div>
-          <Magic8VRF />
+          <Orakul />
         </div>
       </main>
     </>

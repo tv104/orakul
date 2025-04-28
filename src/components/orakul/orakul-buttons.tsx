@@ -2,22 +2,22 @@
 
 import { cn } from "@/utils";
 import { Button } from "../button";
-import { useMagic8VRFContext } from "@/providers";
+import { useOrakulContext } from "@/providers";
 
-interface Magic8ButtonsProps {
+interface OrakulButtonsProps {
   submittedQuestion: boolean;
   isSubmitting: boolean;
   onSubmit: () => void;
   onReset: () => void;
 }
 
-export const Magic8Buttons = ({
+export const OrakulButtons = ({
   submittedQuestion,
   isSubmitting,
   onSubmit,
   onReset,
-}: Magic8ButtonsProps) => {
-  const { outcomeIndex } = useMagic8VRFContext();
+}: OrakulButtonsProps) => {
+  const { outcomeIndex } = useOrakulContext();
   const hasOutcomeIndex = outcomeIndex !== undefined;
 
   return (
@@ -40,7 +40,7 @@ export const Magic8Buttons = ({
         >
           {isSubmitting || submittedQuestion
             ? "Waiting for approval..."
-            : "Ask the Magic 8 VRF"}
+            : "Consult the Orakul"}
         </Button>
       )}
 

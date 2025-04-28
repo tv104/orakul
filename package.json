@@ -1,5 +1,5 @@
 {
-  "name": "magic-8-vrf",
+  "name": "orakul",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -10,7 +10,7 @@
     "lint": "next lint",
     "compile": "cd blockchain && npx hardhat compile",
     "node": "cd blockchain && npx hardhat node",
-    "deploy-magic8vrf-local": "cd blockchain && npx hardhat run ./scripts/deploy-magic8vrf.js --network localhost",
+    "deploy-orakul-local": "cd blockchain && npx hardhat run ./scripts/deploy-orakul.js --network localhost",
     "deploy-coinflip-local": "cd blockchain && npx hardhat run ./scripts/deploy-coinflip.js --network localhost",
     "auto-fulfill-vrf": "cd blockchain && npx hardhat run ./scripts/auto-fulfill-vrf.js --network localhost",
     "test-blockchain": "cd blockchain && npx hardhat test"

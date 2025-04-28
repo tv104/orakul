@@ -4,5 +4,5 @@ export * from './parallax-background';
 export * from './status-item';
 export * from './status-list';
 export * from './text-input';
-export * from "./magic-8-vrf/magic-8-vrf";
+export * from "./orakul/orakul";
 
