@@ -20,6 +20,26 @@
   }
 }
 
+@layer utilities {
+  .filter-opacity-0 {
+    filter: opacity(0%);
+  }
+
+  .filter-opacity-100 {
+    filter: opacity(100%);
+  }
+
+  .fade-out {
+    filter: opacity(0%);
+    transition: filter 2s ease-out;
+  }
+
+  .fade-in {
+    filter: opacity(100%);
+    transition: filter 2s ease-out;
+  }
+}
+
 html {
   font-size: var(--font-size);
 }
