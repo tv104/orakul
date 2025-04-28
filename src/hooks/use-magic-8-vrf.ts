@@ -5,7 +5,7 @@ import { useAccount, useReadContract, useWriteContract, useWatchContractEvent } 
 import magic8VRF from "../artifacts/contracts/Magic8VRF.sol/Magic8VRF.json";
 import { isNewRequestIdInFirstLog, isOutcomeIndexInFirstLog } from "@/utils";
 import { envConfig } from "@/utils";
-import { checklistSteps } from "@/components";
+import { type StepKey } from "@/components";
 
 const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
 const CONTRACT_ABI = magic8VRF.abi;
@@ -18,7 +18,7 @@ export function useMagic8VRF() {
   const [error, setError] = useState<string | null>(null);
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>(undefined);
   const [outcomeIndex, setOutcomeIndex] = useState<number | undefined>(undefined);
-  const [activeStep, setActiveStep] = useState<keyof typeof checklistSteps>("init"); // UI state
+  const [activeStep, setActiveStep] = useState<StepKey>("init"); // UI state
   
   const { data: maxQuestionLength } = useReadContract({
     address: NEXT_PUBLIC_CONTRACT_ADDRESS,

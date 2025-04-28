@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { useMagic8VRFContext } from "@/providers";
-import { cn } from "@/utils";
 import { StatusList } from "./status-list";
 import { Magic8Form } from "./magic-8-form";
 
@@ -24,15 +23,9 @@ export const Magic8VRF = () => {
 
       <StatusList
         activeStep={activeStep}
-        className={cn(
-          "filter-opacity-0 mt-auto",
-          activeStep === "completed"
-            ? "fade-out"
-            : submittedQuestion
-            ? "fade-in"
-            : "",
-          "ease-in"
-        )}
+        hidden={activeStep === "completed"}
+        visible={submittedQuestion && activeStep !== "completed"}
+        className="mt-auto"
       />
     </div>
   );

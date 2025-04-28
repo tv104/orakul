@@ -1,6 +1,8 @@
 import { cn } from "@/utils";
+import { useCallback } from "react";
+import { StatusItem } from "./status-item";
 
-export const checklistSteps = {
+const checklistSteps = {
   init: "Transaction lobbed into the mempool abyss",
   waiting_for_tx_mined: "Miners extracting MEV from your hopium",
   waiting_for_event_prediction_result:
@@ -8,50 +10,53 @@ export const checklistSteps = {
   completed: "", // intentionally left blank, like your wallet after gas fees
 };
 const stepOrder = Object.keys(checklistSteps);
+export type StepKey = keyof typeof checklistSteps;
 
 interface StatusListProps {
-  activeStep: keyof typeof checklistSteps;
+  activeStep: StepKey;
   className?: string;
+  hidden?: boolean;
+  visible?: boolean;
 }
 
-export const StatusList = ({ activeStep, className }: StatusListProps) => {
+export const StatusList = ({
+  activeStep,
+  className,
+  hidden,
+  visible,
+}: StatusListProps) => {
+  const getStepStatus = useCallback(
+    (key: string) => {
+      const activeIndex = stepOrder.indexOf(activeStep);
+      const currentIndex = stepOrder.indexOf(key);
+
+      return {
+        isCompleted: key === "completed" ? true : currentIndex < activeIndex,
+        isUpcoming: currentIndex > activeIndex,
+      };
+    },
+    [activeStep]
+  );
+
   return (
-    <ol className={cn("flex flex-col gap-0 w-full", className)}>
+    <ol
+      className={cn(
+        "flex flex-col gap-0 w-full filter-opacity-0",
+        { "fade-out": hidden, "fade-in": visible },
+        "ease-in",
+        className
+      )}
+    >
       {Object.entries(checklistSteps).map(([key, value]) => {
-        const isCompleted =
-          key === "completed"
-            ? true
-            : stepOrder.indexOf(key) < stepOrder.indexOf(activeStep);
-        const isUpcoming =
-          stepOrder.indexOf(key) > stepOrder.indexOf(activeStep);
+        const { isCompleted, isUpcoming } = getStepStatus(key);
 
         return (
-          value.length > 0 && (
-            <li
-              key={key}
-              className={cn(
-                "text-sm text-center opacity-100 transition-colors relative mx-auto duration-200",
-                {
-                  "text-green-400": isCompleted,
-                  "text-gray-200": isUpcoming,
-                }
-              )}
-            >
-              <span className="inline-flex gap-2">
-                {value}
-                <span
-                  className={cn(
-                    "text-green-400 opacity-0 transition-opacity duration-200",
-                    {
-                      "opacity-100": isCompleted,
-                    }
-                  )}
-                >
-                  ✓
-                </span>
-              </span>
-            </li>
-          )
+          <StatusItem
+            key={key}
+            message={value}
+            isCompleted={isCompleted}
+            isUpcoming={isUpcoming}
+          />
         );
       })}
     </ol>
