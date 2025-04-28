@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Web3Provider } from "@/providers";
+import { Magic8VRFProvider, Web3Provider } from "@/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Web3Provider>{children}</Web3Provider>
+        <Web3Provider>
+          <Magic8VRFProvider>{children}</Magic8VRFProvider>
+        </Web3Provider>
       </body>
     </html>
   );

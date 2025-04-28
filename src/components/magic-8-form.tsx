@@ -6,26 +6,20 @@ import { useConnect } from "wagmi";
 
 import { assertNotUndefined, cn, MAGIC_8_VRF_TRANSLATIONS } from "@/utils";
 import { Button, TextInput } from "./";
+import { useMagic8VRFContext } from "@/providers";
 
 interface Magic8FormProps {
-  isConnected: boolean;
-  maxQuestionLength: number;
-  outcomeIndex?: number;
-  askQuestion: (question: string) => Promise<string | null>;
-  reset: () => void;
   submittedQuestion: boolean;
   setSubmittedQuestion: (value: boolean) => void;
 }
 
 export const Magic8Form = ({
-  isConnected,
-  maxQuestionLength,
-  outcomeIndex,
-  askQuestion,
-  reset,
   submittedQuestion,
   setSubmittedQuestion,
 }: Magic8FormProps) => {
+  const { isConnected, maxQuestionLength, outcomeIndex, askQuestion, reset } =
+    useMagic8VRFContext();
+
   const { connect } = useConnect();
   const [question, setQuestion] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
