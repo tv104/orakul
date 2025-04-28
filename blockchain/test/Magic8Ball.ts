@@ -77,7 +77,7 @@ describe("Magic8Ball", function () {
 
     it("Should have correct max question length", async function () {
       const { magic8Ball } = await loadFixture(deployMagic8BallFixture);
-      expect(await magic8Ball.getMaxQuestionLength()).to.equal(200);
+      expect(await magic8Ball.getMaxQuestionLength()).to.equal(120);
     });
   });
 

@@ -40,7 +40,7 @@ contract Magic8Ball is VRFConsumerBaseV2 {
 
     // Magic 8 Ball constants
     uint8 private constant NUM_OUTCOMES = 20;
-    uint256 private constant MAX_QUESTION_LENGTH = 200;
+    uint256 private constant MAX_QUESTION_LENGTH = 120;
 
     // Prediction status
     struct PredictionStatus {
