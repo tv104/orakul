@@ -1,12 +1,11 @@
 import { cn } from "@/utils";
 
 export const checklistSteps = {
-  init: "Submitted transaction",
-  waiting_for_tx_mined: "Waiting for transaction to be mined",
-  waiting_for_event_prediction_result: "Waiting for magic 8 ball outcome",
-  completed: "", // intentionally left blank
+  init: "Transaction lobbed into the mempool abyss",
+  waiting_for_tx_mined: "Consulting the blockchain oracles...",
+  waiting_for_event_prediction_result: "Shaking the magic 8 ball...",
+  completed: "", // intentionally left blank, like your wallet after gas fees
 };
-
 const stepOrder = Object.keys(checklistSteps);
 
 interface StatusListProps {

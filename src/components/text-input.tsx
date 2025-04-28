@@ -1,6 +1,5 @@
 import { cn } from "@/utils";
 import {
-  useState,
   forwardRef,
   useRef,
   useCallback,
@@ -35,7 +34,6 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
     },
     ref
   ) => {
-    const [isDirty, setIsDirty] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     // Combine the forwarded ref with our local ref
@@ -55,8 +53,6 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
         if (!allowLineBreaks) {
           newValue = newValue.replace(/\r?\n/g, " ");
         }
-
-        setIsDirty(!!newValue.length);
 
         onChange?.({
           ...e,
@@ -83,6 +79,10 @@ export const TextInput = forwardRef<HTMLTextAreaElement, Props>(
       // "auto" required for height to shrink
       textarea.style.height = "auto";
       textarea.style.height = `${textarea.scrollHeight}px`;
+    }, [value]);
+
+    const isDirty = useMemo(() => {
+      return !!value.length;
     }, [value]);
 
     const styles = useMemo(() => {

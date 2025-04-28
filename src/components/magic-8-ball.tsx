@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 
 import { useMagic8Ball } from "@/hooks";
@@ -15,6 +15,7 @@ export const Magic8Ball = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedQuestion, setSubmittedQuestion] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [displayedAnswer, setDisplayedAnswer] = useState("");
 
   const {
     activeStep,
@@ -23,7 +24,42 @@ export const Magic8Ball = () => {
     isConnected,
     maxQuestionLength,
     outcomeIndex,
+    reset,
   } = useMagic8Ball();
+
+  const hasOutcomeIndex = outcomeIndex !== undefined;
+  const fullAnswer = hasOutcomeIndex
+    ? `\n\n🔮 ${MAGIC_8_BALL_ANSWERS[outcomeIndex]}`
+    : "";
+
+  useLayoutEffect(() => {
+    if (!hasOutcomeIndex) {
+      setDisplayedAnswer("");
+      return;
+    }
+
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= fullAnswer.length) {
+        setDisplayedAnswer(
+          fullAnswer.slice(0, currentIndex) +
+            (currentIndex < fullAnswer.length ? "▌" : "")
+        );
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 150);
+
+    return () => clearInterval(typingInterval);
+  }, [hasOutcomeIndex, fullAnswer]);
+
+  const textInputValue = useMemo(() => {
+    if (hasOutcomeIndex) {
+      return question + displayedAnswer;
+    }
+    return question;
+  }, [hasOutcomeIndex, question, displayedAnswer]);
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
@@ -56,14 +92,22 @@ export const Magic8Ball = () => {
     }
   };
 
+  const handleReset = () => {
+    reset();
+    setSubmittedQuestion(false);
+    setQuestion("");
+    setDisplayedAnswer("");
+    inputRef.current?.focus();
+  };
+
   const formStyles = cn(
-    "flex flex-col gap-5 transition-position duration-2000 ease-out relative",
+    "mt-auto flex flex-col gap-7 transition-position duration-2000 ease-out relative",
     {
       "-translate-y-10": submittedQuestion,
     }
   );
 
-  // using `filter-opacity` and `transition-all` to avoid clashing with internal opacity.
+  // using `filter-opacity` and `transition-all` to avoid clashing with internal styles.
   const fadeOutStyles = cn("filter-[opacity(100%)]", {
     "transition-all duration-2000 ease-out filter-[opacity(0%)]":
       submittedQuestion,
@@ -75,12 +119,16 @@ export const Magic8Ball = () => {
   });
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-5 justify-center relative">
-      <form onSubmit={handleSubmit} className={formStyles}>
+    <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-7 relative">
+      <form
+        onSubmit={handleSubmit}
+        onReset={handleReset}
+        className={formStyles}
+      >
         <TextInput
           ref={inputRef}
           label="Type your question"
-          value={question}
+          value={textInputValue}
           maxLength={maxQuestionLength}
           disabled={isSubmitting || submittedQuestion}
           onChange={(e) => setQuestion(e.target.value)}
@@ -91,31 +139,56 @@ export const Magic8Ball = () => {
           maxLengthClassName={fadeOutStyles}
         />
 
-        <Button
-          type="submit"
-          size="large"
-          disabled={isSubmitting || submittedQuestion}
-          className={cn("mx-auto", fadeOutStyles)}
+        <div
+          className={cn(
+            "flex flex-row gap-5 justify-center",
+            submittedQuestion && fadeOutStyles,
+            hasOutcomeIndex && displayedAnswer === fullAnswer && fadeInStyles
+          )}
         >
-          {isSubmitting || submittedQuestion
-            ? "Waiting for approval..."
-            : "Ask the Magic 8 Ball"}
-        </Button>
+          {hasOutcomeIndex ? (
+            <Button
+              type="button"
+              size="large"
+              disabled={isSubmitting || submittedQuestion}
+            >
+              View history
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              size="large"
+              disabled={isSubmitting || submittedQuestion}
+            >
+              {isSubmitting || submittedQuestion
+                ? "Waiting for approval..."
+                : "Ask the Magic 8 Ball"}
+            </Button>
+          )}
+
+          {hasOutcomeIndex && (
+            <Button
+              type="reset"
+              size="large"
+              variant="outlined"
+              disabled={!submittedQuestion}
+            >
+              Ask another question
+            </Button>
+          )}
+        </div>
       </form>
 
       {error && (
         <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>
       )}
 
-      {outcomeIndex !== undefined && (
-        <div className="p-4 bg-green-100 text-green-700 rounded">
-          {MAGIC_8_BALL_ANSWERS[outcomeIndex]}
-        </div>
-      )}
-
       <StatusList
         activeStep={activeStep}
-        className={activeStep === "completed" ? fadeOutStyles : fadeInStyles}
+        className={cn(
+          activeStep === "completed" ? fadeOutStyles : fadeInStyles,
+          "mt-auto ease-in"
+        )}
       />
     </div>
   );

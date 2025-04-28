@@ -87,7 +87,15 @@ export function useMagic8Ball() {
     }
   }, [isConnected, writeContractAsync]);
 
-  const processedMaxQuestionLength = typeof maxQuestionLength === 'bigint' || typeof maxQuestionLength === 'number' ? Number(maxQuestionLength) : 200;
+  const reset = useCallback(() => {
+    setRequestId(undefined);
+    setError(null);
+    setPendingTxHash(undefined);
+    setOutcomeIndex(undefined);
+    setActiveStep("init");
+  }, []);
+
+  const processedMaxQuestionLength = typeof maxQuestionLength === 'bigint' || typeof maxQuestionLength === 'number' ? Number(maxQuestionLength) : 120;
   
   return {
     activeStep,
@@ -95,7 +103,7 @@ export function useMagic8Ball() {
     error,
     isConnected,
     maxQuestionLength: processedMaxQuestionLength,
-    requestId,
-    outcomeIndex
+    outcomeIndex,
+    reset,
   };
 }
