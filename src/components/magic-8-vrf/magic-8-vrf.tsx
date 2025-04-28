@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { useMagic8VRFContext } from "@/providers";
-import { StatusList } from "./status-list";
+import { StatusList } from "../status-list";
 import { Magic8Form } from "./magic-8-form";
 
 export const Magic8VRF = () => {

@@ -3,10 +3,10 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
-
 import { assertNotUndefined, cn, MAGIC_8_VRF_TRANSLATIONS } from "@/utils";
-import { Button, TextInput } from "./";
+import { TextInput } from "../text-input";
 import { useMagic8VRFContext } from "@/providers";
+import { Magic8Buttons } from "./magic-8-buttons";
 
 interface Magic8FormProps {
   submittedQuestion: boolean;
@@ -122,39 +122,12 @@ export const Magic8Form = ({
         maxLengthClassName={submittedQuestion ? "fade-out" : ""}
       />
 
-      <div
-        className={cn("flex flex-row gap-5 justify-center", {
-          "fade-out": submittedQuestion,
-          "fade-in": hasOutcomeIndex && displayedAnswer === fullAnswer,
-        })}
-      >
-        {hasOutcomeIndex ? (
-          <Button type="button" size="large" disabled>
-            View history
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            size="large"
-            disabled={isSubmitting || submittedQuestion}
-          >
-            {isSubmitting || submittedQuestion
-              ? "Waiting for approval..."
-              : "Ask the Magic 8 VRF"}
-          </Button>
-        )}
-
-        {hasOutcomeIndex && (
-          <Button
-            type="reset"
-            size="large"
-            variant="outlined"
-            disabled={!submittedQuestion}
-          >
-            Ask another question
-          </Button>
-        )}
-      </div>
+      <Magic8Buttons
+        submittedQuestion={submittedQuestion}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
+        onReset={handleReset}
+      />
     </form>
   );
 };
