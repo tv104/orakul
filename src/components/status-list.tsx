@@ -2,8 +2,9 @@ import { cn } from "@/utils";
 
 export const checklistSteps = {
   init: "Transaction lobbed into the mempool abyss",
-  waiting_for_tx_mined: "Consulting the blockchain oracles...",
-  waiting_for_event_prediction_result: "Shaking the magic 8 ball...",
+  waiting_for_tx_mined: "Miners extracting MEV from your hopium",
+  waiting_for_event_prediction_result:
+    "Oracle hamsters running on their wheels...",
   completed: "", // intentionally left blank, like your wallet after gas fees
 };
 const stepOrder = Object.keys(checklistSteps);

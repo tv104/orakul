@@ -10,7 +10,7 @@ import { checklistSteps } from "@/components";
 const { NEXT_PUBLIC_CONTRACT_ADDRESS } = envConfig;
 const CONTRACT_ABI = magic8VRF.abi;
 
-export function useMagic8Ball() {
+export function useMagic8VRF() {
   const { isConnected } = useAccount();
   const { writeContractAsync } = useWriteContract();
 

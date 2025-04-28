@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 
-import { useMagic8Ball } from "@/hooks";
+import { useMagic8VRF } from "@/hooks";
 import { cn } from "@/utils";
 import { StatusList } from "./status-list";
 import { Magic8Form } from "./magic-8-form";
 
-export const Magic8Ball = () => {
+export const Magic8VRF = () => {
   const [submittedQuestion, setSubmittedQuestion] = useState(false);
 
   const {
@@ -18,7 +18,7 @@ export const Magic8Ball = () => {
     maxQuestionLength,
     outcomeIndex,
     reset,
-  } = useMagic8Ball();
+  } = useMagic8VRF();
 
   return (
     <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-7 relative">

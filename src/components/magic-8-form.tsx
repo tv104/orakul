@@ -4,7 +4,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { useConnect } from "wagmi";
 
-import { assertNotUndefined, cn, MAGIC_8_BALL_ANSWERS } from "@/utils";
+import { assertNotUndefined, cn, MAGIC_8_VRF_TRANSLATIONS } from "@/utils";
 import { Button, TextInput } from "./";
 
 interface Magic8FormProps {
@@ -34,7 +34,7 @@ export const Magic8Form = ({
 
   const hasOutcomeIndex = outcomeIndex !== undefined;
   const fullAnswer = hasOutcomeIndex
-    ? `\n\n🔮 ${MAGIC_8_BALL_ANSWERS[outcomeIndex]}`
+    ? `\n\n🔮 ${MAGIC_8_VRF_TRANSLATIONS[outcomeIndex]}`
     : "";
 
   useLayoutEffect(() => {
@@ -146,7 +146,7 @@ export const Magic8Form = ({
           >
             {isSubmitting || submittedQuestion
               ? "Waiting for approval..."
-              : "Ask the Magic 8 Ball"}
+              : "Ask the Magic 8 VRF"}
           </Button>
         )}
 

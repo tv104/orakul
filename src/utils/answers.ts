@@ -1,5 +1,5 @@
 // Index matches the answer number in the contract
-export const MAGIC_8_BALL_ANSWERS = [
+export const MAGIC_8_VRF_TRANSLATIONS = [
     "It is certain",
     "It is decidedly so",
     "Without a doubt",
