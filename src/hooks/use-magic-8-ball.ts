@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWatchContractEvent } from "wagmi";
 import magic8Ball from "../artifacts/contracts/Magic8Ball.sol/Magic8Ball.json";
-import { assertValidAddress, isOutcomeIndexInLog } from "@/utils";
+import { isNewRequestIdInFirstLog, isOutcomeIndexInFirstLog } from "@/utils";
 import { envConfig } from "@/utils";
 import { checklistSteps } from "@/components";
 
@@ -35,18 +35,11 @@ export function useMagic8Ball() {
       const relevantLogs = logs.filter(log => 
         log.transactionHash === pendingTxHash
       );
-      
-      if (relevantLogs.length > 0) {
-        const log = relevantLogs[0];
-        
-        // topics[0] = event signature, topics[1] = first indexed param
-        if (log.topics && log.topics.length > 1 && log.topics[1]) {
-          const newRequestId = log.topics[1] as `0x${string}`;
-          assertValidAddress(newRequestId);
-          setActiveStep("waiting_for_event_prediction_result");
-          setRequestId(newRequestId);
-          setPendingTxHash(undefined);
-        }
+
+      if (isNewRequestIdInFirstLog(relevantLogs)) {
+        setRequestId(relevantLogs[0].topics[1]);
+        setPendingTxHash(undefined);
+        setActiveStep("waiting_for_event_prediction_result");
       }
     },
   });
@@ -57,23 +50,14 @@ export function useMagic8Ball() {
     eventName: 'PredictionResult',
     enabled: requestId !== undefined,
     async onLogs(logs) {
-      console.log("logs", logs);
       const relevantLogs = logs.filter(log => 
         log.topics[1] === requestId
       );
 
-      if (relevantLogs.length > 0) {
-        const log = relevantLogs[0];
-
-        if (isOutcomeIndexInLog(log)) {
-          setOutcomeIndex(log.args.outcomeIndex);	
-          setRequestId(undefined);
-          setActiveStep("completed");
-        } else {
-          throw new Error("Invalid log format: missing args or args is not an object");
-        }
-      } else {
-        console.error("No relevant logs found");
+      if (isOutcomeIndexInFirstLog(relevantLogs)) {
+        setOutcomeIndex(relevantLogs[0].args.outcomeIndex);
+        setRequestId(undefined);
+        setActiveStep("completed");
       }
     },
   });

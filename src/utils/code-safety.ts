@@ -11,25 +11,18 @@ export function assertNotUndefined<T>(value: T | undefined, message: string): as
     }
 }
 
-export function assertValidAddress(address: string): asserts address is `0x${string}` {
-    if (!address.startsWith("0x")) {
+
+export function isValidAddress(address: unknown): address is `0x${string}` {
+    if (typeof address !== 'string' || !address.startsWith("0x")) {
+        return false;
+    }
+    
+    return true
+}
+
+export function assertValidAddress(address: unknown): asserts address is `0x${string}` {
+    if (!isValidAddress(address)) {
         throw new Error("Address is not a valid Ethereum address");
     }
 }
 
-export function isOutcomeIndexInLog(log: unknown): log is { args: { outcomeIndex: number } } {
-    if (typeof log !== 'object' || log === null) {
-      return false;
-    }
-    
-    const typedLog = log as Record<string, unknown>;
-    
-    // Check if args exists and is an object
-    if (!typedLog.args || typeof typedLog.args !== 'object' || typedLog.args === null) {
-      return false;
-    }
-    
-    // Check if args.outcomeIndex exists and is a number
-    const args = typedLog.args as Record<string, unknown>;
-    return 'outcomeIndex' in args && typeof args.outcomeIndex === 'number';
-  }
