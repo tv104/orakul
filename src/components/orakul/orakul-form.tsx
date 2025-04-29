@@ -8,12 +8,12 @@ import { OrakulButtons } from "./orakul-buttons";
 import { useNotifications } from "@/hooks";
 
 interface OrakulFormProps {
-  submittedQuestion: boolean;
+  hasSubmitted: boolean;
   setSubmittedQuestion: (value: boolean) => void;
 }
 
 export const OrakulForm = ({
-  submittedQuestion,
+  hasSubmitted,
   setSubmittedQuestion,
 }: OrakulFormProps) => {
   const { maxQuestionLength, outcomeIndex, askQuestion, reset } =
@@ -62,7 +62,7 @@ export const OrakulForm = ({
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
 
-    if (isSubmitting || submittedQuestion) return;
+    if (isSubmitting || hasSubmitted) return;
 
     if (!question.trim()) {
       showInfo("Question required");
@@ -93,7 +93,7 @@ export const OrakulForm = ({
   const formStyles = cn(
     "mt-auto flex flex-col gap-8 transition-position duration-2000 ease-out relative",
     {
-      "-translate-y-10": submittedQuestion,
+      "-translate-y-10": hasSubmitted,
     }
   );
 
@@ -104,20 +104,23 @@ export const OrakulForm = ({
         label="Type your question"
         value={textInputValue}
         maxLength={maxQuestionLength}
-        disabled={isSubmitting || submittedQuestion}
+        disabled={isSubmitting || hasSubmitted}
         onChange={(e) => setQuestion(e.target.value)}
         autoComplete="off"
         required
         onEnter={() => handleSubmit()}
-        labelClassName={submittedQuestion ? "fade-out" : ""}
-        maxLengthClassName={submittedQuestion ? "fade-out" : ""}
+        labelClassName={hasSubmitted ? "fade-out" : ""}
+        maxLengthClassName={hasSubmitted ? "fade-out" : ""}
       />
 
       <OrakulButtons
-        submittedQuestion={submittedQuestion}
+        hasSubmitted={hasSubmitted}
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
         onReset={handleReset}
+        isPostReveal={
+          hasOutcomeIndex && displayedAnswer.length === fullAnswer.length
+        }
       />
     </form>
   );

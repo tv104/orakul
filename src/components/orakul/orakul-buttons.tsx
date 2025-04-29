@@ -2,32 +2,30 @@
 
 import { cn } from "@/utils";
 import { Button } from "../button";
-import { useOrakulContext } from "@/providers";
 
 interface OrakulButtonsProps {
-  submittedQuestion: boolean;
+  hasSubmitted: boolean;
   isSubmitting: boolean;
   onSubmit: () => void;
   onReset: () => void;
+  isPostReveal: boolean;
 }
 
 export const OrakulButtons = ({
-  submittedQuestion,
+  hasSubmitted,
   isSubmitting,
   onSubmit,
   onReset,
+  isPostReveal,
 }: OrakulButtonsProps) => {
-  const { outcomeIndex } = useOrakulContext();
-  const hasOutcomeIndex = outcomeIndex !== undefined;
-
   return (
     <div
       className={cn("flex flex-row gap-5 justify-center", {
-        "fade-out": submittedQuestion,
-        "fade-in": hasOutcomeIndex,
+        "fade-out": hasSubmitted,
+        "fade-in": isPostReveal,
       })}
     >
-      {hasOutcomeIndex ? (
+      {isPostReveal ? (
         <Button type="button" size="large" disabled>
           View history
         </Button>
@@ -35,21 +33,19 @@ export const OrakulButtons = ({
         <Button
           type="submit"
           size="large"
-          disabled={isSubmitting || submittedQuestion}
+          disabled={isSubmitting || hasSubmitted}
           onClick={onSubmit}
         >
-          {isSubmitting || submittedQuestion
-            ? "Waiting for approval..."
-            : "Consult the Orakul"}
+          Ask
         </Button>
       )}
 
-      {hasOutcomeIndex && (
+      {isPostReveal && (
         <Button
           type="reset"
           size="large"
           variant="outlined"
-          disabled={!submittedQuestion}
+          disabled={!hasSubmitted}
           onClick={onReset}
         >
           Ask another question
