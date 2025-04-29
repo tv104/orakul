@@ -10,6 +10,7 @@
     "lint": "next lint",
     "compile": "cd blockchain && npx hardhat compile",
     "node": "cd blockchain && npx hardhat node",
+    "blockchain": "node start-blockchain.js",
     "deploy-orakul-local": "cd blockchain && npx hardhat run ./scripts/deploy-orakul.js --network localhost",
     "deploy-coinflip-local": "cd blockchain && npx hardhat run ./scripts/deploy-coinflip.js --network localhost",
     "auto-fulfill-vrf": "cd blockchain && npx hardhat run ./scripts/auto-fulfill-vrf.js --network localhost",
