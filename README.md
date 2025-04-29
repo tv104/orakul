@@ -1,8 +1,10 @@
 # Orakul
 
-**Orakul** is an on-chain, verifiably random answer generator, powered by [Chainlink VRF](https://docs.chain.link/vrf).
+**Orakul** is a verifiably random answer generator powered by [Chainlink VRF](https://docs.chain.link/vrf) and built with Next.js.
 
-Built as an educational web3 project, inspired by the [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball).
+[orakul.mp4](https://github.com/user-attachments/assets/adb74a98-02aa-4f4f-92ca-f86458dcd997)
+
+Developed as a personal learning project to explore web3 technologies, inspired by the [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball).
 
 ## Features
 
@@ -14,9 +16,11 @@ Built as an educational web3 project, inspired by the [Magic 8 Ball](https://en.
 ## Local development
 
 ```bash
+git clone git@github.com:tv104/orakul.git
+cd ./orakul
 npm install
-npm run blockchain # starts hardhat, deploys contracts, mocks VRF responses
-npm run dev # run the front-end
+npm run blockchain # start hardhat, deploy contracts, mock VRF
+npm run dev # run the front-end in a second terminal
 ```
 
 ## License
