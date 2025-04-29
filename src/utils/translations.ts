@@ -103,5 +103,5 @@ export const ORAKUL_TRANSLATIONS = [
   "Even the universe laughs",
   "Not in this lifetime",
   "Pure delusion",
-  "The simulationis mocking you"
+  "The simulation is mocking you"
 ];
