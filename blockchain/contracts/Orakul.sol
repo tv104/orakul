@@ -16,13 +16,13 @@ contract Orakul is VRFConsumerBaseV2 {
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
-    uint8 private constant NUM_OUTCOMES = 20;
+    uint8 private constant NUM_OUTCOMES = 99;
     uint256 private constant MAX_QUESTION_LENGTH = 120;
 
     struct PredictionStatus {
         bool fulfilled;
-        uint8 outcomeIndex; // 0-19
-        address player;
+        uint8 outcomeIndex; // 0-98
+        address sender;
         string question;
     }
 
@@ -31,7 +31,7 @@ contract Orakul is VRFConsumerBaseV2 {
 
     event PredictionRequested(
         uint256 indexed requestId,
-        address indexed player,
+        address indexed sender,
         string question
     );
     event PredictionResult(uint256 indexed requestId, uint8 outcomeIndex);
@@ -69,7 +69,7 @@ contract Orakul is VRFConsumerBaseV2 {
         predictions[requestId] = PredictionStatus({
             fulfilled: false,
             outcomeIndex: 0,
-            player: msg.sender,
+            sender: msg.sender,
             question: question
         });
 
@@ -85,7 +85,6 @@ contract Orakul is VRFConsumerBaseV2 {
     ) internal override {
         require(!predictions[requestId].fulfilled, "Request already fulfilled");
 
-        // Use the random word to determine the outcome (0-19)
         uint8 outcomeIndex = uint8(randomWords[0] % NUM_OUTCOMES);
         predictions[requestId].fulfilled = true;
         predictions[requestId].outcomeIndex = outcomeIndex;
@@ -101,7 +100,7 @@ contract Orakul is VRFConsumerBaseV2 {
         returns (
             bool fulfilled,
             uint8 outcomeIndex,
-            address player,
+            address sender,
             string memory question
         )
     {
@@ -109,7 +108,7 @@ contract Orakul is VRFConsumerBaseV2 {
         return (
             prediction.fulfilled,
             prediction.outcomeIndex,
-            prediction.player,
+            prediction.sender,
             prediction.question
         );
     }

@@ -6,9 +6,9 @@ async function main() {
   
   console.log("Starting VRF auto-fulfillment script...");
   
-  Orakul.on("PredictionRequested", async (requestId, player, question) => {
+  Orakul.on("PredictionRequested", async (requestId, sender, question) => {
     console.log(`Detected prediction request ID: ${requestId.toString()}`);
-    console.log(`Player: ${player}`);
+    console.log(`Sender: ${sender}`);
     console.log(`Question: ${question}`);
     
     // simulate real-world delay

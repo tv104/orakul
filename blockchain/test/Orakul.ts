@@ -39,10 +39,8 @@ describe("Orakul ", function () {
     // Add Orakul as VRF consumer
     await mockCoordinator.addConsumer(subscriptionId, await orakul.getAddress());
 
-    // Get signers
-    const [owner, player] = await ethers.getSigners();
-
-    return { orakul, mockCoordinator, owner, player, subscriptionId };
+    const [owner, sender] = await ethers.getSigners();
+    return { orakul, mockCoordinator, owner, sender, subscriptionId };
   }
 
   // Helper function to extract requestId from transaction receipt
@@ -72,7 +70,7 @@ describe("Orakul ", function () {
 
     it("Should have correct number of outcomes", async function () {
       const { orakul } = await loadFixture(deployOrakulFixture);
-      expect(await orakul.getTotalOutcomes()).to.equal(20);
+      expect(await orakul.getTotalOutcomes()).to.equal(99);
     });
 
     it("Should have correct max question length", async function () {
@@ -83,51 +81,51 @@ describe("Orakul ", function () {
 
   describe("Asking a Question", function () {
     it("Should emit PredictionRequested when asking a question", async function () {
-      const { orakul, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, sender } = await loadFixture(deployOrakulFixture);
       const question = "will my wife come back if I double my portfolio?";
     
-      await expect(orakul.connect(player).askQuestion(question))
+      await expect(orakul.connect(sender).askQuestion(question))
         .to.emit(orakul, "PredictionRequested")
-        .withArgs(anyValue, player.address, question);
+        .withArgs(anyValue, sender.address, question);
     });
 
     it("Should store prediction request details correctly", async function () {
-      const { orakul, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, sender } = await loadFixture(deployOrakulFixture);
       const question = "should I buy this L2 token or just burn the money directly?";
       
-      const tx = await orakul.connect(player).askQuestion(question);
+      const tx = await orakul.connect(sender).askQuestion(question);
       const requestId = await getRequestId(tx);
 
       const prediction = await orakul.predictions(requestId);
       expect(prediction.fulfilled).to.be.false;
       expect(prediction.outcomeIndex).to.equal(0);
-      expect(prediction.player).to.equal(player.address);
+      expect(prediction.sender).to.equal(sender.address);
       expect(prediction.question).to.equal(question);
     });
 
     it("Should reject empty questions", async function () {
-      const { orakul, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, sender } = await loadFixture(deployOrakulFixture);
       
-      await expect(orakul.connect(player).askQuestion(""))
+      await expect(orakul.connect(sender).askQuestion(""))
         .to.be.revertedWith("Question cannot be empty");
     });
 
     it("Should reject questions that are too long", async function () {
-      const { orakul, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, sender } = await loadFixture(deployOrakulFixture);
       
       // Create a question that's longer than the maximum allowed length
       const maxLength = await orakul.getMaxQuestionLength();
       const longQuestion = "?".repeat(Number(maxLength) + 1);
       
-      await expect(orakul.connect(player).askQuestion(longQuestion))
+      await expect(orakul.connect(sender).askQuestion(longQuestion))
         .to.be.revertedWith("Question too long");
     });
 
     it("Should fulfill random request and emit result", async function () {
-      const { orakul, mockCoordinator, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, mockCoordinator, sender } = await loadFixture(deployOrakulFixture);
       const question = "will this founder dump on me before or after mainnet?";
       
-      const tx = await orakul.connect(player).askQuestion(question);
+      const tx = await orakul.connect(sender).askQuestion(question);
       const requestId = await getRequestId(tx);
 
       const randomWords = [4n]; 
@@ -144,14 +142,14 @@ describe("Orakul ", function () {
       const prediction = await orakul.predictions(requestId);
       expect(prediction.fulfilled).to.be.true;
       expect(prediction.outcomeIndex).to.equal(4);
-      expect(prediction.player).to.equal(player.address);
+      expect(prediction.sender).to.equal(sender.address);
       expect(prediction.question).to.equal(question);
     });
 
     it("Should not allow fulfilling same request twice", async function () {
-      const { orakul, mockCoordinator, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, mockCoordinator, sender } = await loadFixture(deployOrakulFixture);
       
-      const tx = await orakul.connect(player).askQuestion("was that top signal or am I just bad at this?");
+      const tx = await orakul.connect(sender).askQuestion("was that top signal or am I just bad at this?");
       const requestId = await getRequestId(tx);
 
       // First fulfillment with fixed random value
@@ -175,10 +173,10 @@ describe("Orakul ", function () {
 
   describe("Getting Results", function () {
     it("Should return correct prediction result with question", async function () {
-      const { orakul, mockCoordinator, player } = await loadFixture(deployOrakulFixture);
+      const { orakul, mockCoordinator, sender } = await loadFixture(deployOrakulFixture);
       const question = "will my stablecoin still be stable tomorrow?";
       
-      const tx = await orakul.connect(player).askQuestion(question);
+      const tx = await orakul.connect(sender).askQuestion(question);
       const requestId = await getRequestId(tx);
 
       // Fulfill with fixed random value
@@ -189,20 +187,20 @@ describe("Orakul ", function () {
         randomWords
       );
 
-      const [fulfilled, outcomeIndex, resultPlayer, resultQuestion] = await orakul.getPredictionResult(requestId);
+      const [fulfilled, outcomeIndex, resultSender, resultQuestion] = await orakul.getPredictionResult(requestId);
       expect(fulfilled).to.be.true;
       expect(outcomeIndex).to.equal(7);
-      expect(resultPlayer).to.equal(player.address);
+      expect(resultSender).to.equal(sender.address);
       expect(resultQuestion).to.equal(question);
     });
 
     it("Should return default values for non-existent prediction", async function () {
       const { orakul } = await loadFixture(deployOrakulFixture);
       
-      const [fulfilled, outcomeIndex, player, question] = await orakul.getPredictionResult(999);
+      const [fulfilled, outcomeIndex, sender, question] = await orakul.getPredictionResult(999);
       expect(fulfilled).to.be.false;
       expect(outcomeIndex).to.equal(0);
-      expect(player).to.equal(ethers.ZeroAddress);
+      expect(sender).to.equal(ethers.ZeroAddress);
       expect(question).to.equal("");
     });
   });
