@@ -1,7 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
-const isTest = process.env.NODE_ENV === "test";
+const isTest = process.env.HARDHAT_TEST === "true";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
@@ -15,8 +15,8 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 31337,
       mining: {
-        auto: !isTest,
-        ...(isTest ? {} : { interval: 1000 })
+        auto: isTest,
+        interval: isTest ? undefined : 1000
       }
     },
     localhost: {
