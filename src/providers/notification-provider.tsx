@@ -47,7 +47,7 @@ export const NotificationProvider: React.FC<PropsWithChildren> = ({
   }, []);
 
   const showNotification = useCallback(
-    ({ message, type = "info", duration = 5000 }: Notification) => {
+    ({ message, type = "info", duration = 3000 }: Notification) => {
       const id = Math.random().toString(36).substring(2, 9);
       setVisibleNotifications((prev) => [
         ...prev,
@@ -76,18 +76,8 @@ export const useNotificationContext = () => {
 
   const { showNotification } = context;
 
-  const showInfo = (message: string, duration?: number) => {
-    showNotification({ message, type: "info", duration });
-  };
-
-  const showError = (message: string, duration?: number) => {
-    showNotification({ message, type: "error", duration });
-  };
-
   return {
     showNotification,
-    showInfo,
-    showError,
   };
 };
 
