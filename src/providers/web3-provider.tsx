@@ -10,7 +10,8 @@ const { NEXT_PUBLIC_HARDHAT_RPC_URL, NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL } =
   envConfig;
 
 const isDevelopment = process.env.NODE_ENV === "development";
-export const config = createConfig({
+
+export const wagmiConfig = createConfig({
   chains: isDevelopment ? [hardhat] : [baseSepolia],
   transports: {
     [hardhat.id]: http(NEXT_PUBLIC_HARDHAT_RPC_URL),
@@ -23,7 +24,7 @@ const queryClient = new QueryClient();
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );

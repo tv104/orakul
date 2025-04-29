@@ -4,17 +4,23 @@ import { useConnect, useAccount, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { Button } from "./button";
 import { useMemo } from "react";
+import { useNotifications } from "@/hooks";
 
 export const ConnectWallet = () => {
-  const { connect } = useConnect();
+  const { connectAsync } = useConnect();
+  const { disconnectAsync } = useDisconnect();
   const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { notifyUser } = useNotifications();
 
-  const handleClick = () => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      connect({ connector: injected() });
+  const handleClick = async () => {
+    try {
+      if (isConnected) {
+        await disconnectAsync();
+      } else {
+        await connectAsync({ connector: injected() });
+      }
+    } catch (error: unknown) {
+      notifyUser(error);
     }
   };
 

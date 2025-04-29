@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { OrakulProvider, Web3Provider } from "@/providers";
+import {
+  OrakulProvider,
+  Web3Provider,
+  NotificationProvider,
+} from "@/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Web3Provider>
-          <OrakulProvider>{children}</OrakulProvider>
+          <NotificationProvider>
+            <OrakulProvider>{children}</OrakulProvider>
+          </NotificationProvider>
         </Web3Provider>
+        <div id="notification-root"></div>
       </body>
     </html>
   );

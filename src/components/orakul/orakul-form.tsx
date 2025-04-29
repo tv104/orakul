@@ -1,12 +1,11 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { injected } from "wagmi/connectors";
-import { useConnect } from "wagmi";
 import { assertNotUndefined, cn, ORAKUL_TRANSLATIONS } from "@/utils";
 import { TextInput } from "../text-input";
 import { useOrakulContext } from "@/providers";
 import { OrakulButtons } from "./orakul-buttons";
+import { useNotifications } from "@/hooks";
 
 interface OrakulFormProps {
   submittedQuestion: boolean;
@@ -17,14 +16,14 @@ export const OrakulForm = ({
   submittedQuestion,
   setSubmittedQuestion,
 }: OrakulFormProps) => {
-  const { isConnected, maxQuestionLength, outcomeIndex, askQuestion, reset } =
+  const { maxQuestionLength, outcomeIndex, askQuestion, reset } =
     useOrakulContext();
 
-  const { connect } = useConnect();
   const [question, setQuestion] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [displayedAnswer, setDisplayedAnswer] = useState("");
+  const { showInfo, notifyUser } = useNotifications();
 
   const hasOutcomeIndex = outcomeIndex !== undefined;
   const fullAnswer = hasOutcomeIndex
@@ -48,7 +47,7 @@ export const OrakulForm = ({
       } else {
         clearInterval(typingInterval);
       }
-    }, 150);
+    }, 100);
 
     return () => clearInterval(typingInterval);
   }, [hasOutcomeIndex, fullAnswer]);
@@ -66,26 +65,19 @@ export const OrakulForm = ({
     if (isSubmitting || submittedQuestion) return;
 
     if (!question.trim()) {
-      alert("Question required");
+      showInfo("Question required");
       inputRef.current?.focus();
-      return;
-    }
-
-    if (!isConnected) {
-      alert("Please connect your wallet first");
-      connect({ connector: injected() });
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const requestId = await askQuestion(question); // this triggers the wallet
+      const requestId = await askQuestion(question); // wallet detection/tx is handled here
       assertNotUndefined(requestId, "Request ID is undefined");
       setSubmittedQuestion(true);
     } catch (error) {
-      console.error("Transaction was rejected or failed:", error);
       setSubmittedQuestion(false);
-      // TODO UI error handling
+      notifyUser(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -96,7 +88,6 @@ export const OrakulForm = ({
     setSubmittedQuestion(false);
     setQuestion("");
     setDisplayedAnswer("");
-    inputRef.current?.focus();
   };
 
   const formStyles = cn(

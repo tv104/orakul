@@ -8,7 +8,7 @@ import { OrakulForm } from "./orakul-form";
 
 export const Orakul = () => {
   const [submittedQuestion, setSubmittedQuestion] = useState(false);
-  const { activeStep, error } = useOrakulContext();
+  const { activeStep } = useOrakulContext();
 
   return (
     <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-7 relative">
@@ -16,10 +16,6 @@ export const Orakul = () => {
         submittedQuestion={submittedQuestion}
         setSubmittedQuestion={setSubmittedQuestion}
       />
-
-      {error && (
-        <div className="p-4 bg-red-100 text-red-700 rounded">{error}</div>
-      )}
 
       <StatusList
         activeStep={activeStep}
