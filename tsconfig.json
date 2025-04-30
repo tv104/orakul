@@ -23,5 +23,10 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "blockchain/scripts/deploy.js"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "blockchain", 
+    ".next",
+    "out"
+  ]
 }
