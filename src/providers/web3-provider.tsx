@@ -1,21 +1,17 @@
 "use client";
 
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { hardhat, baseSepolia } from "wagmi/chains";
+import { hardhat } from "wagmi/chains";
 import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { envConfig } from "@/utils";
 
-const { NEXT_PUBLIC_HARDHAT_RPC_URL, NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL } =
-  envConfig;
-
-const isDevelopment = process.env.NODE_ENV === "development";
+const { NEXT_PUBLIC_HARDHAT_RPC_URL } = envConfig;
 
 export const wagmiConfig = createConfig({
-  chains: isDevelopment ? [hardhat] : [baseSepolia],
+  chains: [hardhat],
   transports: {
     [hardhat.id]: http(NEXT_PUBLIC_HARDHAT_RPC_URL),
-    [baseSepolia.id]: http(NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL),
   },
   ssr: true,
 });
