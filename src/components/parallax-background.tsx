@@ -53,6 +53,9 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
         src={backgroundImage}
         alt="background"
         fill
+        sizes="100vw"
+        quality={85}
+        priority
         className="object-cover will-change-transform"
         style={{ transform: backgroundTransform }}
       />
@@ -60,6 +63,9 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
         src={foregroundImage}
         alt="foreground"
         fill
+        sizes="100vw"
+        quality={100}
+        priority
         className="object-cover will-change-transform"
         style={{ transform: foregroundTransform }}
       />
