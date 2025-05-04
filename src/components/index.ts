@@ -5,4 +5,4 @@ export * from './status-item';
 export * from './status-list';
 export * from './text-input';
 export * from "./orakul/orakul";
-
+export * from "./spherical-text";
