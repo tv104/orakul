@@ -15,14 +15,12 @@ export type StepKey = keyof typeof checklistSteps;
 interface StatusListProps {
   activeStep: StepKey;
   className?: string;
-  hidden?: boolean;
   visible?: boolean;
 }
 
 export const StatusList = ({
   activeStep,
   className,
-  hidden,
   visible,
 }: StatusListProps) => {
   const getStepStatus = useCallback(
@@ -41,9 +39,8 @@ export const StatusList = ({
   return (
     <ol
       className={cn(
-        "flex flex-col gap-0 w-full filter-opacity-0",
-        { "fade-out": hidden, "fade-in": visible },
-        "ease-in",
+        "flex flex-col gap-0 w-full filter-opacity-0 ease-in transition-filter delay-300 duration-fade-in",
+        { "fade-in": visible },
         className
       )}
     >

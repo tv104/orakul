@@ -4,6 +4,9 @@
   --font-size: 18px;
   --background: #0a0a0a;
   --foreground: #ededed;
+
+  --transition-fade-out: 1000ms;
+  --transition-fade-in: 2000ms;
 }
 
 @theme inline {
@@ -11,9 +14,32 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --duration-fade-out: var(--transition-fade-out);
+  --duration-fade-in: var(--transition-fade-in);
 }
 
 @layer utilities {
+  .duration-short {
+    transition-duration: 150ms;
+  }
+
+  .duration-medium {
+    transition-duration: 300ms;
+  }
+
+  .duration-long {
+    transition-duration: 500ms;
+  }
+
+  .duration-fade-out {
+    transition-duration: var(--duration-fade-out);
+  }
+
+  .duration-fade-in {
+    transition-duration: var(--duration-fade-in);
+  }
+
   .filter-opacity-0 {
     filter: opacity(0%);
   }
@@ -24,12 +50,12 @@
 
   .fade-out {
     filter: opacity(0%);
-    transition: filter 2s ease-out;
+    transition: filter var(--duration-fade-out) ease-out;
   }
 
   .fade-in {
     filter: opacity(100%);
-    transition: filter 2s ease-out;
+    transition: filter var(--duration-fade-in) ease-out;
   }
 
   @keyframes notificationEnterAndExit {
@@ -53,6 +79,33 @@
 
   .enter-and-exit-notification {
     animation: notificationEnterAndExit 3s ease-in-out forwards;
+  }
+
+  @keyframes hueRotate {
+    0% {
+      backdrop-filter: hue-rotate(0deg);
+    }
+    15% {
+      backdrop-filter: hue-rotate(360deg);
+    }
+    30% {
+      backdrop-filter: hue-rotate(720deg);
+    }
+    60% {
+      backdrop-filter: hue-rotate(1080deg);
+    }
+    75% {
+      backdrop-filter: hue-rotate(1440deg);
+    }
+    90% {
+      backdrop-filter: hue-rotate(1800deg);
+    }
+    100% {
+      backdrop-filter: hue-rotate(2160deg);
+    }
+  }
+  .animate-hue-rotate {
+    animation: hueRotate 0.5s linear infinite;
   }
 }
 

@@ -8,7 +8,7 @@ import { OrakulForm } from "./orakul-form";
 
 export const Orakul = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const { activeStep } = useOrakulContext();
+  const { activeStep, isLoading } = useOrakulContext();
 
   return (
     <div className="max-w-xl mx-auto flex flex-col flex-1 w-full gap-7 relative">
@@ -19,8 +19,7 @@ export const Orakul = () => {
 
       <StatusList
         activeStep={activeStep}
-        hidden={activeStep === "completed"}
-        visible={hasSubmitted && activeStep !== "completed"}
+        visible={isLoading}
         className="mt-auto"
       />
     </div>

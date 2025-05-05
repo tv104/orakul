@@ -1,11 +1,12 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { assertNotUndefined, cn, ORAKUL_TRANSLATIONS } from "@/utils";
+import { useRef, useState } from "react";
+import { assertNotUndefined, cn } from "@/utils";
 import { TextInput } from "../text-input";
 import { useOrakulContext } from "@/providers";
-import { OrakulButtons } from "./orakul-buttons";
 import { useNotifications } from "@/hooks";
+import { Button } from "../button";
+import { PostRevealButtons } from "./post-reveal-buttons";
 
 interface OrakulFormProps {
   hasSubmitted: boolean;
@@ -22,42 +23,9 @@ export const OrakulForm = ({
   const [question, setQuestion] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [displayedAnswer, setDisplayedAnswer] = useState("");
   const { showInfo, notifyUser } = useNotifications();
 
   const hasOutcomeIndex = outcomeIndex !== undefined;
-  const fullAnswer = hasOutcomeIndex
-    ? `\n\n🔮 ${ORAKUL_TRANSLATIONS[outcomeIndex]}`
-    : "";
-
-  useLayoutEffect(() => {
-    if (!hasOutcomeIndex) {
-      setDisplayedAnswer("");
-      return;
-    }
-
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullAnswer.length) {
-        setDisplayedAnswer(
-          fullAnswer.slice(0, currentIndex) +
-            (currentIndex < fullAnswer.length ? "▌" : "")
-        );
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 100);
-
-    return () => clearInterval(typingInterval);
-  }, [hasOutcomeIndex, fullAnswer]);
-
-  const textInputValue = useMemo(() => {
-    if (hasOutcomeIndex) {
-      return question + displayedAnswer;
-    }
-    return question;
-  }, [hasOutcomeIndex, question, displayedAnswer]);
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
@@ -87,41 +55,54 @@ export const OrakulForm = ({
     reset();
     setSubmittedQuestion(false);
     setQuestion("");
-    setDisplayedAnswer("");
   };
 
   const formStyles = cn(
-    "mt-auto flex flex-col gap-8 transition-position duration-2000 ease-out relative",
+    "mt-auto flex flex-col gap-8 transition-position duration-fade-in ease-out relative",
     {
       "-translate-y-10": hasSubmitted,
     }
   );
 
   return (
-    <form onSubmit={handleSubmit} onReset={handleReset} className={formStyles}>
-      <TextInput
-        ref={inputRef}
-        label="Type your question"
-        value={textInputValue}
-        maxLength={maxQuestionLength}
-        disabled={isSubmitting || hasSubmitted}
-        onChange={(e) => setQuestion(e.target.value)}
-        autoComplete="off"
-        required
-        onEnter={() => handleSubmit()}
-        labelClassName={hasSubmitted ? "fade-out" : ""}
-        maxLengthClassName={hasSubmitted ? "fade-out" : ""}
-      />
-
-      <OrakulButtons
-        hasSubmitted={hasSubmitted}
-        isSubmitting={isSubmitting}
+    <>
+      <form
         onSubmit={handleSubmit}
         onReset={handleReset}
-        isPostReveal={
-          hasOutcomeIndex && displayedAnswer.length === fullAnswer.length
-        }
+        className={formStyles}
+      >
+        <TextInput
+          ref={inputRef}
+          label="Type your question"
+          value={question}
+          maxLength={maxQuestionLength}
+          disabled={isSubmitting || hasSubmitted}
+          onChange={(e) => setQuestion(e.target.value)}
+          autoComplete="off"
+          required
+          onEnter={() => handleSubmit()}
+          labelClassName={hasSubmitted ? "fade-out" : ""}
+          maxLengthClassName={hasSubmitted ? "fade-out" : ""}
+        />
+
+        <Button
+          type="submit"
+          size="large"
+          disabled={isSubmitting || hasSubmitted}
+          onClick={() => handleSubmit()}
+          className={cn("mx-auto", {
+            "fade-out": hasSubmitted,
+          })}
+        >
+          Ask
+        </Button>
+      </form>
+
+      <PostRevealButtons
+        hasSubmitted={hasSubmitted}
+        onReset={handleReset}
+        isPostReveal={hasOutcomeIndex}
       />
-    </form>
+    </>
   );
 };
