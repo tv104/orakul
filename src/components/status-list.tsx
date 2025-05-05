@@ -39,7 +39,7 @@ export const StatusList = ({
   return (
     <ol
       className={cn(
-        "flex flex-col gap-0 w-full filter-opacity-0 ease-in transition-filter delay-300 duration-1000",
+        "flex flex-col gap-0 w-full filter-opacity-0 ease-in transition-filter delay-300 duration-fade-in",
         { "fade-in": visible },
         className
       )}

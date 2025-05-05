@@ -58,7 +58,7 @@ export const OrakulForm = ({
   };
 
   const formStyles = cn(
-    "mt-auto flex flex-col gap-8 transition-position duration-2000 ease-out relative",
+    "mt-auto flex flex-col gap-8 transition-position duration-fade-in ease-out relative",
     {
       "-translate-y-10": hasSubmitted,
     }

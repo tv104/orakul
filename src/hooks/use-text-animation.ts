@@ -7,14 +7,14 @@ const PAUSE_DURATION = 500;
 export function useTextAnimation(isLoading: boolean, outcomeIndex: number | undefined) {
   const [displayText, setDisplayText] = useState(".");
   const [opacityClass, setOpacityClass] = useState("opacity-0");
-  const [durationClass, setDurationClass] = useState("duration-(--duration-fade-out)");
+  const [durationClass, setDurationClass] = useState("duration-fade-out");
   const prevOutcomeIndexRef = useRef<number | undefined>(undefined);
   const prevLoadingRef = useRef<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleLoading = useCallback(() => {
     setOpacityClass("opacity-0");
-    setDurationClass("duration-(--duration-fade-out)");
+    setDurationClass("duration-fade-out");
 
     timerRef.current = setTimeout(() => {
       setDisplayText(". ");
@@ -24,7 +24,7 @@ export function useTextAnimation(isLoading: boolean, outcomeIndex: number | unde
 
   const handleReset = useCallback(() => {
     setOpacityClass("opacity-0");
-    setDurationClass("duration-(--duration-fade-out)");
+    setDurationClass("duration-fade-out");
 
     timerRef.current = setTimeout(() => {
       setDisplayText(". ");
@@ -33,13 +33,13 @@ export function useTextAnimation(isLoading: boolean, outcomeIndex: number | unde
 
   const handleOutcome = useCallback((index: number) => {
     setOpacityClass("opacity-0");
-    setDurationClass("duration-(--duration-fade-out)");
+    setDurationClass("duration-fade-out");
 
     timerRef.current = setTimeout(() => {
       setDisplayText(ORAKUL_TRANSLATIONS[index]);
 
       const pauseTimer = setTimeout(() => {
-        setDurationClass("duration-(--duration-fade-in)");
+        setDurationClass("duration-fade-in");
         setOpacityClass("opacity-90");
       }, PAUSE_DURATION);
 
@@ -56,7 +56,7 @@ export function useTextAnimation(isLoading: boolean, outcomeIndex: number | unde
       outcomeIndex === undefined
     ) {
       setOpacityClass("opacity-0");
-      setDurationClass("duration-(--duration-fade-out)");
+      setDurationClass("duration-fade-out");
     } else if (prevOutcomeIndexRef.current !== outcomeIndex) {
       if (
         outcomeIndex === undefined &&

@@ -2,7 +2,7 @@ import { cn } from "@/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-  "cursor-pointer uppercase transition-opacity shadow-2xl transition-colors duration-150",
+  "cursor-pointer uppercase transition-opacity shadow-2xl transition-colors duration-short",
   {
     variants: {
       variant: {

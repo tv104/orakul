@@ -20,6 +20,26 @@
 }
 
 @layer utilities {
+  .duration-short {
+    transition-duration: 150ms;
+  }
+
+  .duration-medium {
+    transition-duration: 300ms;
+  }
+
+  .duration-long {
+    transition-duration: 500ms;
+  }
+
+  .duration-fade-out {
+    transition-duration: var(--duration-fade-out);
+  }
+
+  .duration-fade-in {
+    transition-duration: var(--duration-fade-in);
+  }
+
   .filter-opacity-0 {
     filter: opacity(0%);
   }
@@ -30,12 +50,12 @@
 
   .fade-out {
     filter: opacity(0%);
-    transition: filter 2s ease-out;
+    transition: filter var(--duration-fade-out) ease-out;
   }
 
   .fade-in {
     filter: opacity(100%);
-    transition: filter 2s ease-out;
+    transition: filter var(--duration-fade-in) ease-out;
   }
 
   @keyframes notificationEnterAndExit {
