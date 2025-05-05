@@ -55,7 +55,7 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
       />
 
       <div
-        className="size-full flex flex-col will-change-transform justify-end align-center relative max-w-[1600px] mx-auto translate-y-0 sm:translate-y-0 md:translate-y-20 xl:translate-y-0"
+        className="size-full flex flex-col will-change-transform justify-end align-center relative max-w-[1600px] mx-auto translate-y-0 sm:translate-y-0 md:translate-y-20 xl2:translate-y-0"
         style={{
           transform: transforms.foreground,
         }}
