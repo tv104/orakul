@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWatchContractEvent, injected, useConnect } from "wagmi";
 import orakul from "../artifacts/contracts/Orakul.sol/Orakul.json";
-import { isNewRequestIdInFirstLog, isOutcomeIndexInFirstLog } from "@/utils";
+import { isOutcomeIndexLogForRequestId, isRequestIdLogForTransaction } from "@/utils";
 import { envConfig } from "@/utils";
 import { type StepKey } from "@/components";
 import { useRpcStatus } from "@/hooks";
@@ -34,12 +34,8 @@ export function useOrakul() {
     eventName: 'PredictionRequested',
     enabled: !!pendingTxHash,
     onLogs(logs) {
-      const relevantLogs = logs.filter(log => 
-        log.transactionHash === pendingTxHash
-      );
-      
-      if (isNewRequestIdInFirstLog(relevantLogs)) {
-        setRequestId(relevantLogs[0].topics[1]);
+      if (pendingTxHash && isRequestIdLogForTransaction(logs, pendingTxHash)) {
+        setRequestId(logs[0].topics[1]);
         setPendingTxHash(undefined);
         setActiveStep("waiting_for_event_prediction_result");
       }
@@ -52,12 +48,8 @@ export function useOrakul() {
     eventName: 'PredictionResult',
     enabled: !!requestId,
     async onLogs(logs) {
-      const relevantLogs = logs.filter(log => 
-        log.topics[1] === requestId
-      );
-      
-      if (isOutcomeIndexInFirstLog(relevantLogs)) {
-        setOutcomeIndex(relevantLogs[0].args.outcomeIndex);
+      if (requestId && isOutcomeIndexLogForRequestId(logs, requestId)) {
+        setOutcomeIndex(logs[0].args.outcomeIndex);
         setRequestId(undefined);
         setActiveStep("completed");
       }
