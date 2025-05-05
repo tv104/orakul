@@ -1,10 +1,12 @@
-import { FC, useMemo, useRef, useState, useEffect } from "react";
+"use client";
+
+import { FC, useMemo, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
 
 interface SphericalTextProps {
-  children: string;
+  text: string;
   onReady?: () => void;
   className?: string;
 }
@@ -16,17 +18,18 @@ interface CharPosition {
   key: string;
 }
 
-const rows = 8;
+const rows = 11;
 const radius = 3.5;
-const fontSize = 0.65;
-const rotationSpeed = -0.001;
+const fontSize = 0.4;
+const rotationSpeed = -0.0015;
 const sphereCenter = new THREE.Vector3(0, 0, 0);
 const worldUpDirection = new THREE.Vector3(0, 1, 0);
 
-const SphericalText3D: FC<SphericalTextProps> = ({ children, onReady }) => {
+const SphericalText3D: FC<SphericalTextProps> = ({ text, onReady }) => {
   const group = useRef<THREE.Group>(null);
-  const text = ` ${children}`;
-  const [isReady, setIsReady] = useState(false);
+  const textWithSpace = useMemo(() => {
+    return ` ${text} `;
+  }, [text]);
 
   const characters = useMemo(() => {
     const chars: CharPosition[] = [];
@@ -52,8 +55,8 @@ const SphericalText3D: FC<SphericalTextProps> = ({ children, onReady }) => {
         const x = rowRadius * Math.sin(theta);
         const z = rowRadius * Math.cos(theta);
 
-        const charIndex = (rowIdx + charIdx) % text.length;
-        const char = text[charIndex];
+        const charIndex = (rowIdx + charIdx) % textWithSpace.length;
+        const char = textWithSpace[charIndex];
         const charPosition = new THREE.Vector3(x, y, z);
 
         const rotationMatrix = new THREE.Matrix4().lookAt(
@@ -76,19 +79,18 @@ const SphericalText3D: FC<SphericalTextProps> = ({ children, onReady }) => {
     }
 
     return chars;
-  }, [text]);
+  }, [textWithSpace]);
 
   useEffect(() => {
     const checkReady = () => {
-      if (!isReady && group.current) {
-        setIsReady(true);
-        if (onReady) onReady();
+      if (group.current) {
+        onReady?.();
       }
     };
 
     const timer = setTimeout(checkReady, 100);
     return () => clearTimeout(timer);
-  }, [isReady, onReady]);
+  }, [onReady]);
 
   useFrame(() => {
     if (group.current) group.current.rotation.y += rotationSpeed;

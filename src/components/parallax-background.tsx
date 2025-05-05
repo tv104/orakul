@@ -1,15 +1,10 @@
 "use client";
-import { useMousePosition } from "@/hooks";
 import Image, { type StaticImageData } from "next/image";
-import React, {
-  type FC,
-  useMemo,
-  useRef,
-  useEffect,
-  useState,
-  memo,
-} from "react";
+import React, { type FC, useMemo, memo, useCallback } from "react";
 import { SphericalText } from "./spherical-text";
+import { useOrakulContext } from "@/providers";
+import { cn } from "@/utils";
+import { useSmoothMousePosition, useTextAnimation } from "@/hooks";
 
 interface ParallaxBackgroundProps {
   backgroundImage: StaticImageData;
@@ -18,7 +13,6 @@ interface ParallaxBackgroundProps {
 
 const BG_FACTOR = 20;
 const FG_FACTOR = 42;
-const TRANSITION_SPEED = 0.1;
 
 const containerStyles = `fixed inset-[-20px]`;
 
@@ -29,38 +23,23 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
   backgroundImage,
   foregroundImage,
 }) => {
-  // TODO fallback for touch devices
-  const { x, y } = useMousePosition();
-  const [smoothX, setSmoothX] = useState(0);
-  const [smoothY, setSmoothY] = useState(0);
-  const animationRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const animate = () => {
-      setSmoothX((prev) => prev + (x - prev) * TRANSITION_SPEED);
-      setSmoothY((prev) => prev + (y - prev) * TRANSITION_SPEED);
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [x, y]);
+  const { isLoading, outcomeIndex } = useOrakulContext();
+  const { x, y } = useSmoothMousePosition();
+  const { displayText, opacityClass, durationClass } = useTextAnimation(
+    isLoading,
+    outcomeIndex
+  );
 
   const transforms = useMemo(() => {
     return {
-      background: `translate(${smoothX * -BG_FACTOR}px, ${
-        smoothY * -BG_FACTOR
-      }px)`,
-      foreground: `translate(${smoothX * -FG_FACTOR}px, ${
-        smoothY * -FG_FACTOR
-      }px)`,
+      background: `translate(${x * -BG_FACTOR}px, ${y * -BG_FACTOR}px)`,
+      foreground: `translate(${x * -FG_FACTOR}px, ${y * -FG_FACTOR}px)`,
     };
-  }, [smoothX, smoothY]);
+  }, [x, y]);
+
+  const onReadyCallback = useCallback(() => {
+    // TODO use this to preload the app
+  }, []);
 
   return (
     <div className={containerStyles}>
@@ -76,7 +55,7 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
       />
 
       <div
-        className="size-full flex flex-col will-change-transform justify-end align-center relative max-w-[1600px] mx-auto"
+        className="size-full flex flex-col will-change-transform justify-end align-center relative max-w-[1600px] mx-auto translate-y-0 sm:translate-y-0 md:translate-y-20 xl:translate-y-0"
         style={{
           transform: transforms.foreground,
         }}
@@ -85,25 +64,26 @@ export const ParallaxBackground: FC<ParallaxBackgroundProps> = ({
           src={foregroundImage}
           alt="foreground"
           sizes="100vw"
-          quality={100}
+          quality={85}
           priority
           className="object-cover min-h-[600px] sm:min-h-[960px] md:min-h-[1024px] relative"
         />
-        <div className="z-1 absolute inset-0 flex flex-col justify-end items-center">
+        <div className="z-1 absolute inset-0 flex justify-center items-end">
           <div
-            className={`rounded-full overflow-hidden 
+            className={cn(
+              `rounded-full overflow-hidden transition-[filter,opacity] 
               size-[240px] translate-y-[-150px] translate-x-[3px] 
               sm:size-[390px] sm:translate-y-[-235px] sm:translate-x-[3px]
-              md:size-[410px] md:translate-y-[-254px] md:translate-x-[5px] 
-              `}
+              md:size-[410px] md:translate-y-[-254px] md:translate-x-[5px]`,
+              isLoading && "animate-hue-rotate",
+              durationClass,
+              opacityClass
+            )}
           >
             <MemoizedSphericalText
-              onReady={() => {
-                console.log("ready");
-              }}
-            >
-              .
-            </MemoizedSphericalText>
+              text={displayText}
+              onReady={onReadyCallback}
+            />
           </div>
         </div>
       </div>
