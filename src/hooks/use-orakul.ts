@@ -16,6 +16,7 @@ export function useOrakul() {
   const { connectAsync } = useConnect();
   const { writeContractAsync } = useWriteContract();
   const { isConnected: isRpcConnected, checkConnection } = useRpcStatus();
+  const [isLoading, setIsLoading] = useState(false);
   
   const [requestId, setRequestId] = useState<`0x${string}` | undefined>(undefined);
   const [pendingTxHash, setPendingTxHash] = useState<`0x${string}` | undefined>(undefined);
@@ -52,6 +53,7 @@ export function useOrakul() {
         setOutcomeIndex(logs[0].args.outcomeIndex);
         setRequestId(undefined);
         setActiveStep("completed");
+        setIsLoading(false);
       }
     },
   });
@@ -78,11 +80,13 @@ export function useOrakul() {
         functionName: "askQuestion",
         args: [question],
       });
-      
+
+      setIsLoading(true);
       setActiveStep("waiting_for_tx_mined");
       setPendingTxHash(txResult);
       return txResult;
     } catch (err) {
+      setIsLoading(false);
       throw err; // let ui handle the error
     }
   }, [isConnected, isRpcConnected, writeContractAsync, connectAsync, checkConnection]);
@@ -103,5 +107,6 @@ export function useOrakul() {
     maxQuestionLength: processedMaxQuestionLength,
     outcomeIndex,
     reset,
+    isLoading,
   };
 }
