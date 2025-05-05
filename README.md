@@ -2,7 +2,7 @@
 
 **Orakul** is a verifiably random answer generator powered by [Chainlink VRF](https://docs.chain.link/vrf) and built with Next.js.
 
-[orakul.mp4](https://github.com/user-attachments/assets/e7a07647-0ae6-4306-95e5-2f70a977a143)
+[orakul.webm](https://github.com/user-attachments/assets/64f19a2e-6069-4f2f-b450-7608f0de3d59)
 
 Developed as a personal learning project to explore web3 technologies, inspired by the [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball).
 
