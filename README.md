@@ -3,7 +3,7 @@
 Work in progress. Things to do
 - Error handlings like timeouts
 - Improve ThreeJS perf
-- Page without previous questions/answers
+- Page with previous questions/answers
 
 **Orakul** is a verifiably random answer generator powered by [Chainlink VRF](https://docs.chain.link/vrf) and built with Next.js.
 
