@@ -1,13 +1,13 @@
 # Orakul
 
 Work in progress. Things to do
-- Error handlings like timeouts
+- Improved error handling including timeouts
 - Improve ThreeJS perf
 - Page with previous questions/answers
 
 **Orakul** is a verifiably random answer generator powered by [Chainlink VRF](https://docs.chain.link/vrf) and built with Next.js.
 
-[orakul.webm](https://github.com/user-attachments/assets/64f19a2e-6069-4f2f-b450-7608f0de3d59)
+[orakul.mp4](https://github.com/user-attachments/assets/3fdf1bdb-3ce1-4892-9545-9716cc95ce7f)
 
 Developed as a personal learning project to explore web3 technologies, inspired by the [Magic 8 Ball](https://en.wikipedia.org/wiki/Magic_8_Ball).
 
